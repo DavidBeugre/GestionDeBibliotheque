@@ -1,0 +1,6 @@
+# Chaque sous-projet (backend/, frontend/) a son propre .gitignore détaillé.
+# Celui-ci ne couvre que les artefacts globaux au dépôt.
+.DS_Store
+*.log
+.vscode/
+.idea/

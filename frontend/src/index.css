@@ -1,0 +1,182 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ======================================================================
+   DESIGN SYSTEM — Système de Gestion de Bibliothèque
+   Inspiré de Notion / Linear / Stripe Dashboard / Vercel Dashboard,
+   avec une identité propre : vert "lampe de bibliothèque" en primaire,
+   laiton en accent, serif de titrage pour évoquer le monde du livre.
+   ====================================================================== */
+
+@layer base {
+  :root {
+    /* Surfaces */
+    --background: 40 20% 98.5%;
+    --surface: 40 20% 97%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 12%;
+
+    /* Texte */
+    --foreground: 240 10% 12%;
+    --muted: 240 8% 95%;
+    --muted-foreground: 240 5% 42%;
+
+    /* Primaire — vert "lampe de bibliothèque" */
+    --primary: 158 64% 24%;
+    --primary-foreground: 0 0% 100%;
+    --primary-50: 158 45% 95%;
+    --primary-100: 158 40% 88%;
+
+    /* Secondaire — neutre tiède */
+    --secondary: 38 30% 94%;
+    --secondary-foreground: 38 35% 22%;
+
+    /* Accent — laiton (utilisé avec parcimonie : badges, éléments actifs) */
+    --accent: 38 58% 50%;
+    --accent-foreground: 38 70% 14%;
+
+    /* Bordures / champs / focus */
+    --border: 240 10% 89%;
+    --input: 240 10% 87%;
+    --ring: 158 64% 24%;
+
+    /* États sémantiques */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 55% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 92% 12%;
+
+    /* Rayons */
+    --radius-xl: 16px;
+    --radius-lg: 12px;
+    --radius-md: 8px;
+    --radius-sm: 6px;
+
+    /* Ombres — très subtiles, à la Stripe */
+    --shadow-xs: 0 1px 2px 0 rgb(20 20 15 / 0.03);
+    --shadow-sm: 0 1px 3px 0 rgb(20 20 15 / 0.06), 0 1px 2px -1px rgb(20 20 15 / 0.04);
+    --shadow-md: 0 4px 10px -2px rgb(20 20 15 / 0.07), 0 2px 4px -2px rgb(20 20 15 / 0.04);
+    --shadow-lg: 0 12px 28px -6px rgb(20 20 15 / 0.10), 0 4px 10px -4px rgb(20 20 15 / 0.05);
+  }
+
+  .dark {
+    --background: 240 14% 7%;
+    --surface: 240 14% 8.5%;
+    --card: 240 12% 10%;
+    --card-foreground: 240 10% 92%;
+    --popover: 240 12% 10%;
+    --popover-foreground: 240 10% 92%;
+
+    --foreground: 240 10% 93%;
+    --muted: 240 10% 15%;
+    --muted-foreground: 240 6% 64%;
+
+    --primary: 152 50% 46%;
+    --primary-foreground: 240 14% 7%;
+    --primary-50: 152 30% 14%;
+    --primary-100: 152 30% 19%;
+
+    --secondary: 240 9% 16%;
+    --secondary-foreground: 38 40% 78%;
+
+    --accent: 38 55% 58%;
+    --accent-foreground: 38 70% 10%;
+
+    --border: 240 9% 19%;
+    --input: 240 9% 19%;
+    --ring: 152 50% 46%;
+
+    --destructive: 0 65% 56%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 50% 46%;
+    --success-foreground: 240 14% 7%;
+    --warning: 38 85% 56%;
+    --warning-foreground: 38 85% 10%;
+
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.20);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.30), 0 1px 2px -1px rgb(0 0 0 / 0.20);
+    --shadow-md: 0 4px 10px -2px rgb(0 0 0 / 0.35), 0 2px 4px -2px rgb(0 0 0 / 0.20);
+    --shadow-lg: 0 12px 28px -6px rgb(0 0 0 / 0.45), 0 4px 10px -4px rgb(0 0 0 / 0.25);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-surface text-foreground font-sans antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display text-foreground;
+  }
+
+  /* Chiffres et données tabulaires : lisibilité et alignement (cotes, ISBN, matricules, montants) */
+  .font-data {
+    @apply font-mono tabular-nums;
+  }
+
+  /* Focus clavier toujours visible — accessibilité WCAG */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  ::selection {
+    background-color: hsl(var(--primary-100));
+  }
+
+  /* Scrollbar discrète (Webkit) */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 999px;
+    border: 2px solid hsl(var(--surface));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /*
+   * Élément signature du Design System : une "tranche de livre" — fine bande colorée
+   * sur le bord gauche, clin d'œil discret aux dos d'ouvrages alignés sur une étagère.
+   * Utilisée sur les cartes statistiques du dashboard et l'item de navigation actif.
+   */
+  .card-spine {
+    @apply relative overflow-hidden;
+  }
+  .card-spine::before {
+    content: '';
+    @apply absolute inset-y-0 left-0 w-1 bg-primary;
+  }
+  .card-spine-accent::before {
+    @apply bg-accent;
+  }
+}
