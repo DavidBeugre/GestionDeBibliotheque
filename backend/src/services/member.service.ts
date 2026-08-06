@@ -90,8 +90,11 @@ export class MemberService {
       subscriptionExpiry: input.subscriptionExpiry ? new Date(input.subscriptionExpiry) : undefined,
     });
 
-    await EmailService.sendMemberWelcomeEmail(input.email, input.firstName, matricule, temporaryPassword);
     await AuditService.record(AuditAction.CREATE, { entityType: 'Member', entityId: member.id });
+
+    // L'envoi SMTP peut être lent (notamment au réveil d'une offre gratuite).
+    // Il ne doit jamais retarder la création de la fiche adhérent.
+    void EmailService.sendMemberWelcomeEmail(input.email, input.firstName, matricule, temporaryPassword);
 
     return member;
   }
