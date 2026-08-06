@@ -7,6 +7,7 @@ import {
   Wallet,
   BarChart3,
   Settings,
+  ScanLine,
   type LucideIcon,
 } from 'lucide-react';
 import type { RoleName } from '@/types';
@@ -27,5 +28,6 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Réservations', path: '/reservations', icon: BookMarked, roles: ['ADMIN', 'LIBRARIAN'] },
   { label: 'Amendes', path: '/fines', icon: Wallet, roles: ['ADMIN', 'LIBRARIAN'] },
   { label: 'Rapports', path: '/reports', icon: BarChart3, roles: ['ADMIN', 'LIBRARIAN'] },
+  { label: 'Scanner', path: '/scanner', icon: ScanLine, roles: ['ADMIN', 'LIBRARIAN'] },
   { label: 'Paramètres', path: '/settings', icon: Settings, roles: ['ADMIN'] },
 ];

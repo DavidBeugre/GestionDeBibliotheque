@@ -22,6 +22,7 @@ import SettingsPage from '@/pages/settings/SettingsPage';
 import NotFoundPage from '@/pages/errors/NotFoundPage';
 import ForbiddenPage from '@/pages/errors/ForbiddenPage';
 import ServerErrorPage from '@/pages/errors/ServerErrorPage';
+import ScannerPage from '@/pages/ScannerPage';
 
 export const router = createBrowserRouter([
   {
@@ -54,6 +55,7 @@ export const router = createBrowserRouter([
               { path: '/reservations', element: <ReservationsListPage /> },
               { path: '/fines', element: <FinesListPage /> },
               { path: '/reports', element: <ReportsPage /> },
+              { path: '/scanner', element: <ScannerPage /> },
             ],
           },
           {
