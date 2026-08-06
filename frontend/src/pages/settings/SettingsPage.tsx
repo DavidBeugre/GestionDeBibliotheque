@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton';
 import { settingsService } from '@/services/settings.service';
 import { queryKeys } from '@/constants';
+import { API_BASE_URL } from '@/constants';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 const settingsSchema = z.object({
@@ -24,6 +25,7 @@ const settingsSchema = z.object({
   maxBorrowsPerUser: z.coerce.number().int().min(1).max(20),
   finePerDay: z.coerce.number().min(0),
 });
+const resolveMediaUrl = (url: string): string => url.startsWith('/') ? `${API_BASE_URL.replace(/\/api\/v1$/, '')}${url}` : url;
 type SettingsFormValues = z.infer<typeof settingsSchema>;
 
 export default function SettingsPage() {
@@ -97,7 +99,7 @@ export default function SettingsPage() {
           <div className="flex items-center gap-4">
             <div className="flex size-16 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted">
               {settingsQuery.data?.logoUrl ? (
-                <img src={settingsQuery.data.logoUrl} alt="Logo" className="h-full w-full object-cover" />
+                <img src={resolveMediaUrl(settingsQuery.data.logoUrl)} alt="Logo" className="h-full w-full object-cover" />
               ) : (
                 <Library className="size-6 text-muted-foreground" />
               )}

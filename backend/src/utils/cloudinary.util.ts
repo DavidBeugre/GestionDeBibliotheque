@@ -3,6 +3,7 @@ import path from 'path';
 import { randomUUID } from 'crypto';
 import { cloudinary, isCloudinaryConfigured } from '../config/cloudinary';
 import { ApiError } from './ApiError';
+import { env } from '../config/env';
 
 export interface CloudinaryUploadResult {
   url: string;
@@ -27,7 +28,8 @@ async function uploadLocally(buffer: Buffer, mimeType: string): Promise<Cloudina
   const filename = `${randomUUID()}.${getExtension(mimeType)}`;
   await fs.mkdir(uploadDirectory, { recursive: true });
   await fs.writeFile(path.join(uploadDirectory, filename), buffer);
-  return { url: `/uploads/${filename}`, publicId: filename };
+  const publicBaseUrl = process.env.RENDER_EXTERNAL_URL ?? `http://localhost:${env.port}`;
+  return { url: `${publicBaseUrl}/uploads/${filename}`, publicId: filename };
 }
 
 export function uploadBufferToCloudinary(
