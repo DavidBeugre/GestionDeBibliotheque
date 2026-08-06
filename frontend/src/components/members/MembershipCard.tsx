@@ -5,7 +5,7 @@ import { API_BASE_URL } from '@/constants';
 import type { Member } from '@/types';
 
 function initials(firstName: string, lastName: string): string {
-  return `${firstName[0] ?? ''}${lastName[0] ?? ''}`.toUpperCase();
+  return `${firstName?.[0] ?? ''}${lastName?.[0] ?? ''}`.toUpperCase();
 }
 
 function resolveMediaUrl(value?: string | null): string | undefined {

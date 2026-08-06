@@ -69,7 +69,7 @@ export function NewBorrowDialog({ open, onOpenChange }: NewBorrowDialogProps) {
               renderItem={(m) => (
                 <span className="flex items-center gap-2">
                   <Avatar className="size-6">
-                    <AvatarFallback className="text-[10px]">{m.user.firstName[0]}{m.user.lastName[0]}</AvatarFallback>
+                    <AvatarFallback className="text-[10px]">{m.user.firstName?.[0]}{m.user.lastName?.[0]}</AvatarFallback>
                   </Avatar>
                   <span>
                     {m.user.firstName} {m.user.lastName} <span className="text-muted-foreground">· {m.matricule}</span>

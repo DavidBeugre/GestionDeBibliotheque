@@ -265,7 +265,7 @@ export default function BooksListPage() {
                 </div>
                 <div className="min-w-0 w-full">
                   <p className="truncate text-sm font-medium">{book.title}</p>
-                  <p className="truncate text-xs text-muted-foreground">{book.authors[0]?.author.name ?? '—'}</p>
+                  <p className="truncate text-xs text-muted-foreground">{book.authors?.[0]?.author.name ?? '—'}</p>
                 </div>
               </button>
             ))}
