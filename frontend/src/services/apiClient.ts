@@ -24,7 +24,6 @@ export function registerSessionExpiredHandler(handler: () => void): void {
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true, // envoie le cookie httpOnly du refresh token
-  headers: { 'Content-Type': 'application/json' },
 });
 
 apiClient.interceptors.request.use((config) => {
