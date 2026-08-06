@@ -25,6 +25,22 @@ export class BookRepository {
     return prisma.book.findUnique({ where: { isbn } });
   }
 
+  static findRecommendations(bookId: string, categoryId: string | null, authorIds: string[]) {
+    return prisma.book.findMany({
+      where: {
+        id: { not: bookId },
+        status: 'ACTIVE',
+        OR: [
+          ...(categoryId ? [{ categoryId }] : []),
+          ...(authorIds.length ? [{ authors: { some: { authorId: { in: authorIds } } } }] : []),
+        ],
+      },
+      include: bookInclude,
+      orderBy: [{ availableCopies: 'desc' }, { createdAt: 'desc' }],
+      take: 6,
+    });
+  }
+
   static create(data: Prisma.BookCreateInput) {
     return prisma.book.create({ data, include: bookInclude });
   }

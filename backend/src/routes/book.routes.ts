@@ -82,6 +82,7 @@ router.get('/', paginationValidator, listBooksValidator, validate, BookControlle
  *       404: { description: Introuvable }
  */
 router.get('/:id', uuidParamValidator('id'), validate, BookController.getById);
+router.get('/:id/recommendations', uuidParamValidator('id'), validate, BookController.recommendations);
 
 router.post('/', authenticate, requirePermission('book:create'), createBookValidator, validate, BookController.create);
 router.patch(

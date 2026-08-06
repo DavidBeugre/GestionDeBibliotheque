@@ -51,6 +51,11 @@ export class BookService {
     return book;
   }
 
+  static async recommendations(id: string) {
+    const book = await this.getById(id);
+    return BookRepository.findRecommendations(id, book.categoryId, book.authors.map((entry) => entry.authorId));
+  }
+
   static async create(input: CreateBookInput) {
     if (input.isbn) {
       const existing = await BookRepository.findByIsbn(input.isbn);

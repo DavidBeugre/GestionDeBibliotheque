@@ -31,6 +31,11 @@ export const BookController = {
     return ApiResponse.success(res, book, 'Livre');
   }),
 
+  recommendations: asyncHandler(async (req: Request, res: Response) => {
+    const books = await BookService.recommendations(req.params.id);
+    return ApiResponse.success(res, books, 'Recommandations');
+  }),
+
   create: asyncHandler(async (req: Request, res: Response) => {
     const book = await BookService.create(req.body);
     return ApiResponse.created(res, book, 'Livre créé avec succès');
