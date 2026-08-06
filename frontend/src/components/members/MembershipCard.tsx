@@ -1,10 +1,19 @@
 import { Library, QrCode as QrCodeIcon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MEMBER_TYPE_LABELS } from '@/utils/statusConfig';
+import { API_BASE_URL } from '@/constants';
 import type { Member } from '@/types';
 
 function initials(firstName: string, lastName: string): string {
   return `${firstName[0] ?? ''}${lastName[0] ?? ''}`.toUpperCase();
+}
+
+function resolveMediaUrl(value?: string | null): string | undefined {
+  if (!value) return undefined;
+  if (/^https?:\/\//i.test(value)) return value;
+
+  const apiOrigin = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
+  return value.startsWith('/') ? `${apiOrigin}${value}` : `${apiOrigin}/uploads/${value}`;
 }
 
 export function MembershipCard({ member, qrCodeUrl }: { member: Member; qrCodeUrl?: string | null }) {
@@ -22,7 +31,7 @@ export function MembershipCard({ member, qrCodeUrl }: { member: Member; qrCodeUr
 
       <div className="mt-4 flex items-center gap-3">
         <Avatar className="size-12 border-2 border-white/40">
-          <AvatarImage src={member.user.avatarUrl ?? undefined} />
+          <AvatarImage src={resolveMediaUrl(member.user.avatarUrl)} />
           <AvatarFallback className="bg-white/20 text-primary-foreground">
             {initials(member.user.firstName, member.user.lastName)}
           </AvatarFallback>

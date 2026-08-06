@@ -11,7 +11,9 @@ function refreshCookieOptions() {
   return {
     httpOnly: true,
     secure: env.nodeEnv === 'production',
-    sameSite: 'strict' as const,
+    // Vercel et Render sont deux sites distincts : le cookie doit accompagner
+    // les appels cross-site effectués par le frontend de production.
+    sameSite: env.nodeEnv === 'production' ? ('none' as const) : ('lax' as const),
     path: `${env.apiPrefix}/auth`, // le cookie n'est envoyé qu'aux routes d'auth
     maxAge: 7 * 24 * 60 * 60 * 1000,
   };
