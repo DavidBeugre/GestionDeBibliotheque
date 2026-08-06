@@ -20,6 +20,8 @@ const adminPermissions = [
 async function main(): Promise<void> {
   const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
   const password = process.env.ADMIN_PASSWORD;
+  const firstName = process.env.ADMIN_FIRST_NAME?.trim() ?? 'Administrateur';
+  const lastName = process.env.ADMIN_LAST_NAME?.trim() ?? 'Shelfly';
 
   if (!email || !password) {
     throw new Error('ADMIN_EMAIL et ADMIN_PASSWORD sont requis.');
@@ -53,8 +55,8 @@ async function main(): Promise<void> {
     data: {
       email,
       password: await bcrypt.hash(password, 12),
-      firstName: 'David',
-      lastName: 'Beugré',
+      firstName,
+      lastName,
       roleId: adminRole.id,
       isEmailVerified: true,
     },

@@ -49,6 +49,13 @@ export const MemberController = {
     return ApiResponse.success(res, { qrCodeUrl }, 'QR Code de la carte adhérent généré');
   }),
 
+  downloadCardPdf: asyncHandler(async (req: Request, res: Response) => {
+    const pdf = await MemberService.generateCardPdf(req.params.id);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="shelfly-card-${req.params.id}.pdf"`);
+    res.send(pdf);
+  }),
+
   history: asyncHandler(async (req: Request, res: Response) => {
     const history = await MemberService.getHistory(req.params.id);
     return ApiResponse.success(res, history, "Historique de l'adhérent");

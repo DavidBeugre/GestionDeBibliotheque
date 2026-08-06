@@ -8,6 +8,7 @@ import { EmailService } from './email.service';
 import { AuditService } from './audit.service';
 import { AuditAction } from '@prisma/client';
 import { PaginationParams, buildPaginationMeta } from '../utils/pagination.util';
+import { createMemberCardPdf } from '../utils/memberCardPdf.util';
 
 interface CreateMemberInput {
   email: string;
@@ -164,6 +165,10 @@ export class MemberService {
     await this.getById(id);
     const [borrows, reservations, fines] = await MemberRepository.getHistory(id);
     return { borrows, reservations, fines };
+  }
+
+  static async generateCardPdf(id: string) {
+    return createMemberCardPdf(await this.getById(id));
   }
 
   static async suspend(id: string): Promise<void> {

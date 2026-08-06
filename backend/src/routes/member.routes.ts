@@ -37,6 +37,7 @@ router.delete('/:id', uuidParamValidator('id'), validate, MemberController.remov
 
 router.get('/:id/history', uuidParamValidator('id'), validate, MemberController.history);
 router.get('/:id/qrcode', uuidParamValidator('id'), validate, MemberController.generateQrCode);
+router.get('/:id/card.pdf', uuidParamValidator('id'), validate, MemberController.downloadCardPdf);
 router.post('/:id/photo', uuidParamValidator('id'), validate, uploadImage.single('photo'), MemberController.uploadPhoto);
 
 router.post('/:id/suspend', uuidParamValidator('id'), validate, MemberController.suspend);
