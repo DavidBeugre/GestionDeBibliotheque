@@ -11,9 +11,12 @@ function initials(firstName: string, lastName: string): string {
 function resolveMediaUrl(value?: string | null): string | undefined {
   if (!value) return undefined;
   if (/^https?:\/\//i.test(value)) return value;
+  // Les anciens enregistrements ne contiennent parfois qu'un nom de fichier.
+  // Leur fichier local n'existe plus sur Render après un redéploiement.
+  if (!value.startsWith('/')) return undefined;
 
   const apiOrigin = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
-  return value.startsWith('/') ? `${apiOrigin}${value}` : `${apiOrigin}/uploads/${value}`;
+  return `${apiOrigin}${value}`;
 }
 
 export function MembershipCard({ member, qrCodeUrl }: { member: Member; qrCodeUrl?: string | null }) {

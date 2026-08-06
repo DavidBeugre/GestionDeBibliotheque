@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { authService } from '@/services/auth.service';
-import { registerSessionExpiredHandler } from '@/services/apiClient';
+import { registerSessionExpiredHandler, restoreAccessToken } from '@/services/apiClient';
 import type { AuthUser, RoleName } from '@/types';
 
 interface AuthContextValue {
@@ -26,7 +26,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
 
     async function restoreSession() {
-      const result = await authService.refresh();
+      // Le jeton de l'onglet permet de restaurer la session même lorsque le
+      // navigateur bloque les cookies entre Vercel et Render.
+      const result = restoreAccessToken()
+        ? await authService.me().then((user) => ({ user })).catch(() => null)
+        : await authService.refresh();
       if (!cancelled) {
         setUser(result?.user ?? null);
         setIsLoading(false);

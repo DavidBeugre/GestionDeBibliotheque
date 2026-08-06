@@ -113,8 +113,7 @@ export default function MemberDetailPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-3">
           <MembershipCard member={member} qrCodeUrl={member.qrCode} />
-          {canManage && (
-            <div className="flex max-w-xs gap-2">
+          <div className="flex max-w-xs gap-2">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -134,8 +133,7 @@ export default function MemberDetailPage() {
               <Button variant="destructive" size="sm" onClick={() => setDeleteOpen(true)}>
                 <Trash2 className="size-3.5" /> Supprimer
               </Button>
-            </div>
-          )}
+          </div>
         </div>
 
         <div className="space-y-4 lg:col-span-2">

@@ -7,12 +7,27 @@ import type { ApiSuccessResponse } from '@/types';
 // (jamais localStorage/sessionStorage) pour limiter l'exposition en cas de faille XSS.
 let accessToken: string | null = null;
 let onSessionExpired: (() => void) | null = null;
+const ACCESS_TOKEN_STORAGE_KEY = 'shelfly_access_token';
 
 export function setAccessToken(token: string | null): void {
   accessToken = token;
+  if (typeof window === 'undefined') return;
+
+  if (token) {
+    window.sessionStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, token);
+  } else {
+    window.sessionStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+  }
 }
 
 export function getAccessToken(): string | null {
+  return accessToken;
+}
+
+/** Restaure le jeton de l'onglet courant si les cookies cross-site sont bloqués. */
+export function restoreAccessToken(): string | null {
+  if (accessToken || typeof window === 'undefined') return accessToken;
+  accessToken = window.sessionStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
   return accessToken;
 }
 
