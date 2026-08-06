@@ -22,10 +22,10 @@ export const logger = winston.createLogger({
   ],
 });
 
-if (env.nodeEnv !== 'production') {
-  logger.add(
-    new winston.transports.Console({
-      format: combine(colorize(), timestamp({ format: 'HH:mm:ss' }), logFormat),
-    })
-  );
-}
+logger.add(
+  new winston.transports.Console({
+    format: env.nodeEnv === 'production'
+      ? combine(timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), logFormat)
+      : combine(colorize(), timestamp({ format: 'HH:mm:ss' }), logFormat),
+  })
+);
