@@ -52,6 +52,12 @@ export default function BookDetailPage() {
     enabled: !!id,
   });
 
+  const recommendationsQuery = useQuery({
+    queryKey: ['books', id, 'recommendations'],
+    queryFn: () => bookService.recommendations(id!),
+    enabled: !!id,
+  });
+
   const coverMutation = useMutation({
     mutationFn: (file: File) => bookService.uploadCover(id!, file),
     onSuccess: () => {
@@ -223,6 +229,7 @@ export default function BookDetailPage() {
             <TabsList>
               <TabsTrigger value="info">Informations</TabsTrigger>
               <TabsTrigger value="copies">Exemplaires ({book.copies.length})</TabsTrigger>
+              <TabsTrigger value="recommendations">Suggestions</TabsTrigger>
             </TabsList>
 
             <TabsContent value="info">
@@ -291,6 +298,26 @@ export default function BookDetailPage() {
                 {book.copies.length === 0 && (
                   <p className="p-6 text-center text-sm text-muted-foreground">Aucun exemplaire enregistré pour ce livre.</p>
                 )}
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="recommendations">
+              <Card>
+                <CardContent className="pt-5">
+                  <h2 className="mb-4 font-display font-semibold">Suggestions similaires</h2>
+                  {!recommendationsQuery.data?.length ? (
+                    <p className="text-sm text-muted-foreground">Aucune recommandation disponible pour le moment.</p>
+                  ) : (
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {recommendationsQuery.data.map((suggestion) => (
+                        <button key={suggestion.id} onClick={() => navigate(`/books/${suggestion.id}`)} className="rounded-lg border p-3 text-left hover:bg-muted">
+                          <p className="line-clamp-2 text-sm font-medium">{suggestion.title}</p>
+                          <p className="mt-1 text-xs text-muted-foreground">{suggestion.authors.map((a) => a.author.name).join(', ') || 'Auteur inconnu'}</p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
               </Card>
             </TabsContent>
           </Tabs>

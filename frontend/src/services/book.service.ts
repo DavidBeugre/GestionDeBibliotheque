@@ -41,6 +41,11 @@ export const bookService = {
     return res.data.data;
   },
 
+  async recommendations(id: string): Promise<Book[]> {
+    const res = await apiClient.get<ApiSuccessResponse<Book[]>>(`/books/${id}/recommendations`);
+    return res.data.data;
+  },
+
   async create(payload: BookFormValues): Promise<Book> {
     const res = await apiClient.post<ApiSuccessResponse<Book>>('/books', payload);
     return res.data.data;
