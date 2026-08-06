@@ -8,6 +8,7 @@ import { SettingsRepository } from '../repositories/settings.repository';
 import { addHours } from '../utils/circulation.util';
 import { PaginationParams, buildPaginationMeta } from '../utils/pagination.util';
 import { EmailService } from './email.service';
+import { emitToUser } from '../realtime';
 import { prisma } from '../config/database';
 
 interface ReservationFilters {
@@ -113,7 +114,7 @@ export class ReservationService {
 
     const member = await MemberRepository.findById(next.memberId);
     if (member) {
-      await prisma.notification.create({
+      const notification = await prisma.notification.create({
         data: {
           userId: member.userId,
           type: NotificationType.RESERVATION_AVAILABLE,
@@ -121,6 +122,7 @@ export class ReservationService {
           message: `Le livre que vous avez réservé est disponible. Vous avez ${settings.reservationExpiryHours}h pour venir le récupérer.`,
         },
       });
+      emitToUser(member.userId, 'notification:new', notification);
       await EmailService.sendReservationAvailableEmail(
         member.user.email,
         member.user.firstName,

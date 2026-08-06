@@ -2,13 +2,25 @@ import { createApp } from './app';
 import { env } from './config/env';
 import { logger } from './config/logger';
 import { connectDatabase, disconnectDatabase } from './config/database';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import { TokenService } from './services/token.service';
+import { setRealtimeServer } from './realtime';
 
 async function bootstrap(): Promise<void> {
   await connectDatabase();
 
   const app = createApp();
 
-  const server = app.listen(env.port, '0.0.0.0', () => {
+  const httpServer = createServer(app);
+  const io = new Server(httpServer, { cors: { origin: env.frontendUrl, credentials: true } });
+  io.use((socket, next) => {
+    try { socket.data.user = TokenService.verifyAccessToken(String(socket.handshake.auth.token ?? '')); next(); }
+    catch { next(new Error('Non autorisé')); }
+  });
+  io.on('connection', (socket) => socket.join(`user:${socket.data.user.sub}`));
+  setRealtimeServer(io);
+  const server = httpServer.listen(env.port, '0.0.0.0', () => {
     logger.info(`🚀 Serveur démarré sur le port ${env.port} [${env.nodeEnv}]`);
     logger.info(`📚 API disponible sur http://localhost:${env.port}${env.apiPrefix}`);
   });

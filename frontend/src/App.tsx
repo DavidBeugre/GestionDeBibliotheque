@@ -7,8 +7,17 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { router } from '@/routes/router';
+import { connectRealtime } from '@/services/realtime.service';
+import { useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 export default function App() {
+  useEffect(() => {
+    const socket = connectRealtime(() => toast('Nouvelle notification reçue'));
+    return () => {
+      socket?.disconnect();
+    };
+  }, []);
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
