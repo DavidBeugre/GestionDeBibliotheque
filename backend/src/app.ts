@@ -16,6 +16,8 @@ import apiRouter from './routes';
 
 export function createApp(): Application {
   const app = express();
+  // Render se place devant l'application et transmet l'IP via X-Forwarded-For.
+  app.set('trust proxy', 1);
 
   // ---------- Sécurité HTTP ----------
   app.use(
