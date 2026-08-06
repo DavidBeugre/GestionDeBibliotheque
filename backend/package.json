@@ -18,7 +18,8 @@
     "prisma:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node prisma/seed.ts",
-    "admin:create": "ts-node prisma/create-admin.ts"
+    "admin:create": "ts-node prisma/create-admin.ts",
+    "admin:reset-password": "ts-node prisma/reset-admin-password.ts"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
