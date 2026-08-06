@@ -33,6 +33,7 @@ interface EnvConfig {
     user: string;
     password: string;
     from: string;
+    brevoApiKey: string;
   };
 
   cloudinary: {
@@ -87,6 +88,7 @@ export const env: EnvConfig = {
     user: process.env.SMTP_USER ?? '',
     password: process.env.SMTP_PASSWORD ?? '',
     from: process.env.EMAIL_FROM ?? 'Bibliothèque <no-reply@library.com>',
+    brevoApiKey: process.env.BREVO_API_KEY ?? '',
   },
 
   cloudinary: {

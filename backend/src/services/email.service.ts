@@ -93,6 +93,36 @@ export class EmailService {
 
   private static async send(opts: { to: string; subject: string; html: string }): Promise<void> {
     try {
+      if (env.smtp.brevoApiKey) {
+        const senderMatch = env.smtp.from.match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
+        const sender = senderMatch
+          ? { name: senderMatch[1].trim(), email: senderMatch[2].trim() }
+          : { name: 'Shelfly', email: env.smtp.from.trim() };
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            accept: 'application/json',
+            'content-type': 'application/json',
+            'api-key': env.smtp.brevoApiKey,
+          },
+          body: JSON.stringify({
+            sender,
+            to: [{ email: opts.to }],
+            subject: opts.subject,
+            htmlContent: opts.html,
+          }),
+        });
+
+        if (!response.ok) {
+          logger.error(`[EmailService] Brevo API a refusé l'email (${response.status})`);
+          return;
+        }
+
+        const result = (await response.json()) as { messageId?: string };
+        logger.info(`[EmailService] Email accepté par Brevo pour ${opts.to} (id: ${result.messageId ?? 'inconnu'})`);
+        return;
+      }
+
       if (!env.smtp.host) {
         logger.warn(`[EmailService] SMTP non configuré — email simulé vers ${opts.to}: "${opts.subject}"`);
         return;
