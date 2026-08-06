@@ -10,7 +10,7 @@ export default function AuthLayout() {
             <Library className="size-5" />
           </div>
           <div>
-            <h1 className="font-display text-xl font-semibold">Bibliothèque</h1>
+            <h1 className="font-display text-xl font-semibold">Shelfly</h1>
             <p className="text-sm text-muted-foreground">Système de gestion documentaire</p>
           </div>
         </div>

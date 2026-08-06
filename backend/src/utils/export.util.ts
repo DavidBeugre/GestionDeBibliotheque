@@ -25,7 +25,7 @@ export function toCsv(columns: ReportColumn[], rows: ReportRow[]): string {
 
 export async function toExcelBuffer(title: string, columns: ReportColumn[], rows: ReportRow[]): Promise<Buffer> {
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = 'Système de Gestion de Bibliothèque';
+  workbook.creator = 'Shelfly';
   workbook.created = new Date();
 
   const sheet = workbook.addWorksheet(title.slice(0, 31) || 'Rapport');

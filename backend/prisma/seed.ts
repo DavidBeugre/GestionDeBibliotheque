@@ -166,7 +166,7 @@ async function main() {
     update: {},
     create: {
       id: 'default',
-      libraryName: 'Bibliothèque Universitaire Centrale',
+      libraryName: 'Shelfly',
       currency: 'XOF',
       borrowDurationDays: 14,
       maxBorrowsPerUser: 3,

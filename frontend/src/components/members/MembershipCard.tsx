@@ -13,7 +13,7 @@ export function MembershipCard({ member, qrCodeUrl }: { member: Member; qrCodeUr
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
           <Library className="size-4" />
-          <span className="font-display text-xs font-semibold">Bibliothèque</span>
+          <span className="font-display text-xs font-semibold">Shelfly</span>
         </div>
         <span className="text-[10px] uppercase tracking-wide opacity-80">
           {MEMBER_TYPE_LABELS[member.memberType] ?? member.memberType}

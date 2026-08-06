@@ -15,7 +15,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         <div className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
           <Library className="size-4" />
         </div>
-        <span className="font-display text-sm font-semibold">Bibliothèque</span>
+        <span className="font-display text-sm font-semibold">Shelfly</span>
       </div>
 
       <nav className="flex-1 space-y-0.5 overflow-y-auto p-3">
@@ -41,7 +41,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       <div className="border-t border-border p-4 text-xs text-muted-foreground">
-        Système de Gestion de Bibliothèque · v1.0
+        Shelfly · v1.0
       </div>
     </div>
   );
