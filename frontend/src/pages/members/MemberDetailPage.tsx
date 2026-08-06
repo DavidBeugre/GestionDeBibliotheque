@@ -81,6 +81,19 @@ export default function MemberDetailPage() {
 
   const deleteMutation = useMutation({
     mutationFn: () => memberService.remove(id!),
+    onMutate: async () => {
+      const membersKey = ['members'] as const;
+      await queryClient.cancelQueries({ queryKey: membersKey });
+      queryClient.setQueriesData({ queryKey: membersKey }, (cached: unknown) => {
+        if (!cached || typeof cached !== 'object' || !Array.isArray((cached as { items?: unknown[] }).items)) {
+          return cached;
+        }
+        const list = cached as { items: Array<{ id: string }> };
+        return { ...list, items: list.items.filter((item) => item.id !== id) };
+      });
+      setDeleteOpen(false);
+      navigate('/members');
+    },
     onSuccess: () => {
       toast.success('Adhérent supprimé');
       queryClient.invalidateQueries({ queryKey: queryKeys.members() });
