@@ -101,6 +101,7 @@ export class MemberService {
     input: Partial<{
       firstName: string;
       lastName: string;
+      email: string;
       phone: string;
       sex: string;
       birthDate: string;
@@ -113,10 +114,15 @@ export class MemberService {
   ) {
     const member = await this.getById(id);
 
-    const { firstName, lastName, phone, ...memberFields } = input;
+    const { firstName, lastName, email, phone, ...memberFields } = input;
 
-    if (firstName || lastName || phone) {
-      await MemberRepository.updateUser(member.userId, { firstName, lastName, phone });
+    if (firstName || lastName || email || phone) {
+      await MemberRepository.updateUser(member.userId, {
+        firstName,
+        lastName,
+        phone,
+        ...(email ? { email: email.toLowerCase().trim() } : {}),
+      });
     }
 
     return MemberRepository.updateMember(id, {
