@@ -26,9 +26,7 @@ export const settingsService = {
   async updateLogo(file: File): Promise<LibrarySettings> {
     const formData = new FormData();
     formData.append('logo', file);
-    const res = await apiClient.post<ApiSuccessResponse<LibrarySettings>>('/settings/logo', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const res = await apiClient.post<ApiSuccessResponse<LibrarySettings>>('/settings/logo', formData);
     return res.data.data;
   },
 };

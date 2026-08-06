@@ -62,9 +62,7 @@ export const memberService = {
   async uploadPhoto(id: string, file: File): Promise<Member> {
     const formData = new FormData();
     formData.append('photo', file);
-    const res = await apiClient.post<ApiSuccessResponse<Member>>(`/members/${id}/photo`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const res = await apiClient.post<ApiSuccessResponse<Member>>(`/members/${id}/photo`, formData);
     return res.data.data;
   },
 

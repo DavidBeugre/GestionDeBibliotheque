@@ -63,9 +63,7 @@ export const bookService = {
   async uploadCover(id: string, file: File): Promise<Book> {
     const formData = new FormData();
     formData.append('cover', file);
-    const res = await apiClient.post<ApiSuccessResponse<Book>>(`/books/${id}/cover`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const res = await apiClient.post<ApiSuccessResponse<Book>>(`/books/${id}/cover`, formData);
     return res.data.data;
   },
 
