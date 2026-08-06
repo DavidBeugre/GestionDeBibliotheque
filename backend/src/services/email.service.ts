@@ -97,7 +97,12 @@ export class EmailService {
         logger.warn(`[EmailService] SMTP non configuré — email simulé vers ${opts.to}: "${opts.subject}"`);
         return;
       }
-      await getTransporter().sendMail({ from: env.smtp.from, ...opts });
+      if (!env.smtp.user || !env.smtp.password) {
+        logger.warn(`[EmailService] Identifiants SMTP manquants — email non envoyé vers ${opts.to}`);
+        return;
+      }
+      const result = await getTransporter().sendMail({ from: env.smtp.from, ...opts });
+      logger.info(`[EmailService] Email accepté par le serveur SMTP pour ${opts.to} (id: ${result.messageId})`);
     } catch (error) {
       // Un échec d'envoi d'email ne doit jamais faire planter le flux métier (ex: inscription).
       logger.error('[EmailService] Échec d’envoi d’email', error);
