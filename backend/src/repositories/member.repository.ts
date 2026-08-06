@@ -46,13 +46,25 @@ export class MemberRepository {
   }
 
   static async generateNextMatricule(): Promise<string> {
-    const count = await prisma.member.count();
-    return `ADH-${String(count + 1).padStart(5, '0')}`;
+    // Ne pas utiliser count + 1 : après la suppression d'un adhérent, ce
+    // nombre peut déjà être attribué. On repart du plus grand numéro existant.
+    const lastMember = await prisma.member.findFirst({
+      where: { matricule: { startsWith: 'ADH-' } },
+      orderBy: { matricule: 'desc' },
+      select: { matricule: true },
+    });
+    const lastNumber = Number(lastMember?.matricule.match(/(\d+)$/)?.[1] ?? 0);
+    return `ADH-${String(lastNumber + 1).padStart(5, '0')}`;
   }
 
   static async generateNextCardNumber(): Promise<string> {
-    const count = await prisma.member.count();
-    return `CARD-${String(count + 1).padStart(5, '0')}`;
+    const lastMember = await prisma.member.findFirst({
+      where: { cardNumber: { startsWith: 'CARD-' } },
+      orderBy: { cardNumber: 'desc' },
+      select: { cardNumber: true },
+    });
+    const lastNumber = Number(lastMember?.cardNumber?.match(/(\d+)$/)?.[1] ?? 0);
+    return `CARD-${String(lastNumber + 1).padStart(5, '0')}`;
   }
 
   /** Crée en une transaction le compte utilisateur (rôle READER) et le profil adhérent associé. */
