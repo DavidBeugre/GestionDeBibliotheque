@@ -1,29 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, ScanLine } from 'lucide-react';
+import { BrowserMultiFormatReader, type IScannerControls } from '@zxing/browser';
 import { Button } from '@/components/ui/button';
-
-type DetectedCode = { rawValue: string };
-type BarcodeDetectorInstance = { detect: (source: CanvasImageSource) => Promise<DetectedCode[]> };
-
-declare global {
-  interface Window {
-    BarcodeDetector?: new (options?: { formats?: string[] }) => BarcodeDetectorInstance;
-  }
-}
 
 export default function ScannerPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const timerRef = useRef<number | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const controlsRef = useRef<IScannerControls | null>(null);
   const navigate = useNavigate();
   const [message, setMessage] = useState('Activez la caméra pour scanner un QR code ou un code-barres.');
 
   const stop = () => {
-    if (timerRef.current) window.clearInterval(timerRef.current);
-    streamRef.current?.getTracks().forEach((track) => track.stop());
-    timerRef.current = null;
-    streamRef.current = null;
+    controlsRef.current?.stop();
+    controlsRef.current = null;
   };
 
   const openCode = (value: string) => {
@@ -37,20 +26,15 @@ export default function ScannerPage() {
   };
 
   const start = async () => {
-    if (!window.BarcodeDetector) {
-      setMessage('Le scanner caméra n’est pas pris en charge par ce navigateur. Utilisez Chrome ou Edge récent.');
-      return;
-    }
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } });
-      streamRef.current = stream;
-      if (videoRef.current) videoRef.current.srcObject = stream;
-      const detector = new window.BarcodeDetector({ formats: ['qr_code', 'ean_13', 'ean_8', 'code_128'] });
-      timerRef.current = window.setInterval(async () => {
-        if (!videoRef.current || videoRef.current.readyState < 2) return;
-        const codes = await detector.detect(videoRef.current);
-        if (codes[0]?.rawValue) openCode(codes[0].rawValue);
-      }, 500);
+      if (!videoRef.current) return;
+      stop();
+      const reader = new BrowserMultiFormatReader();
+      controlsRef.current = await reader.decodeFromConstraints(
+        { video: { facingMode: { ideal: 'environment' } } },
+        videoRef.current,
+        (result) => { if (result) openCode(result.getText()); }
+      );
       setMessage('Caméra active : placez le code dans le cadre.');
     } catch {
       setMessage('Impossible d’accéder à la caméra. Vérifiez son autorisation dans le navigateur.');
