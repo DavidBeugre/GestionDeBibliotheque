@@ -10,19 +10,29 @@ import { router } from '@/routes/router';
 import { connectRealtime } from '@/services/realtime.service';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
-export default function App() {
+function RealtimeNotifications() {
+  const { user } = useAuth();
+
   useEffect(() => {
+    if (!user) return;
     const socket = connectRealtime(() => toast('Nouvelle notification reçue'));
     return () => {
       socket?.disconnect();
     };
-  }, []);
+  }, [user]);
+
+  return null;
+}
+
+export default function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
           <AuthProvider>
+            <RealtimeNotifications />
             <RouterProvider router={router} />
             <Toaster
               position="top-right"
