@@ -131,6 +131,9 @@ export default function MemberDetailPage() {
               <Button variant="outline" size="sm" onClick={() => qrMutation.mutate()} isLoading={qrMutation.isPending} aria-label="Générer le QR Code">
                 <QrCode className="size-3.5" />
               </Button>
+              <Button variant="destructive" size="sm" onClick={() => setDeleteOpen(true)}>
+                <Trash2 className="size-3.5" /> Supprimer
+              </Button>
             </div>
           )}
         </div>
