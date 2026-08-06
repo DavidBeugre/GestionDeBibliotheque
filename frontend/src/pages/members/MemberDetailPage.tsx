@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { ArrowLeft, Camera, MoreHorizontal, QrCode, ShieldCheck, ShieldOff } from 'lucide-react';
+import { ArrowLeft, Camera, MoreHorizontal, QrCode, ShieldCheck, ShieldOff, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { EmptyState } from '@/components/common/EmptyState';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { MembershipCard } from '@/components/members/MembershipCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { memberService } from '@/services/member.service';
@@ -34,6 +35,7 @@ export default function MemberDetailPage() {
   const { hasPermission } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const canManage = hasPermission(PERMISSIONS.MEMBER_MANAGE);
 
@@ -75,6 +77,16 @@ export default function MemberDetailPage() {
       toast.success('Statut mis à jour');
     },
     onError: (error) => toast.error(getApiErrorMessage(error, 'Impossible de mettre à jour le statut')),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => memberService.remove(id!),
+    onSuccess: () => {
+      toast.success('Adhérent supprimé');
+      queryClient.invalidateQueries({ queryKey: queryKeys.members() });
+      navigate('/members');
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error, "Impossible de supprimer l'adhérent")),
   });
 
   if (memberQuery.isLoading) {
@@ -154,6 +166,9 @@ export default function MemberDetailPage() {
                       <ShieldCheck className="size-3.5" /> Réactiver
                     </DropdownMenuItem>
                   )}
+                  <DropdownMenuItem destructive onClick={() => setDeleteOpen(true)}>
+                    <Trash2 className="size-3.5" /> Supprimer
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
@@ -261,6 +276,15 @@ export default function MemberDetailPage() {
       </div>
 
       <MemberFormDialog open={editOpen} onOpenChange={setEditOpen} member={member} />
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title="Supprimer cet adhérent ?"
+        description="Cette action est irréversible. Elle est refusée si l'adhérent possède encore un emprunt en cours ou des amendes impayées."
+        confirmLabel="Supprimer"
+        isLoading={deleteMutation.isPending}
+        onConfirm={() => deleteMutation.mutate()}
+      />
     </div>
   );
 }
