@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Pencil, Plus, Search, Trash2, Users } from 'lucide-react';
+import { Camera, Pencil, Plus, Search, Trash2, Users } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -17,6 +17,8 @@ export default function AuthorsPage() {
   const [name, setName] = useState('');
   const [nationality, setNationality] = useState('');
   const [editing, setEditing] = useState<Author | null>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const [authorForPhoto, setAuthorForPhoto] = useState<string | null>(null);
 
   const authorsQuery = useQuery({ queryKey: queryKeys.authors(), queryFn: () => catalogService.listAuthors() });
   const authors = useMemo(() => (authorsQuery.data ?? []).filter((author) => author.name.toLowerCase().includes(search.toLowerCase())), [authorsQuery.data, search]);
@@ -43,6 +45,11 @@ export default function AuthorsPage() {
       toast.success('Auteur supprimé');
     },
     onError: (error) => toast.error(getApiErrorMessage(error, "Impossible de supprimer cet auteur")),
+  });
+  const photoMutation = useMutation({
+    mutationFn: ({ id, file }: { id: string; file: File }) => catalogService.uploadAuthorPhoto(id, file),
+    onSuccess: () => { refresh(); toast.success('Photo de l’auteur mise à jour'); },
+    onError: (error) => toast.error(getApiErrorMessage(error, "Impossible d'envoyer cette photo")),
   });
 
   const submit = () => {
@@ -80,12 +87,13 @@ export default function AuthorsPage() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {authors.map((author) => (
             <Card key={author.id} className="flex items-center gap-3 p-4">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">{author.name.charAt(0).toUpperCase()}</div>
+              {author.photoUrl ? <img src={author.photoUrl} alt={author.name} className="size-10 shrink-0 rounded-full object-cover" /> : <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">{author.name.charAt(0).toUpperCase()}</div>}
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{author.name}</p>
                 <p className="truncate text-xs text-muted-foreground">{author.nationality || 'Nationalité non renseignée'}</p>
               </div>
               <div className="flex gap-1">
+                <Button size="icon" variant="ghost" aria-label={`Ajouter une photo pour ${author.name}`} onClick={() => { setAuthorForPhoto(author.id); photoInputRef.current?.click(); }} isLoading={photoMutation.isPending && authorForPhoto === author.id}><Camera className="size-4" /></Button>
                 <Button size="icon" variant="ghost" aria-label={`Modifier ${author.name}`} onClick={() => { setEditing(author); setName(author.name); setNationality(author.nationality ?? ''); }}><Pencil className="size-4" /></Button>
                 <Button size="icon" variant="ghost" aria-label={`Supprimer ${author.name}`} onClick={() => { if (window.confirm(`Supprimer ${author.name} ?`)) deleteMutation.mutate(author.id); }} isLoading={deleteMutation.isPending}><Trash2 className="size-4 text-destructive" /></Button>
               </div>
@@ -93,6 +101,7 @@ export default function AuthorsPage() {
           ))}
         </div>
       )}
+      <input ref={photoInputRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (file && authorForPhoto) photoMutation.mutate({ id: authorForPhoto, file }); event.target.value = ''; }} />
     </div>
   );
 }

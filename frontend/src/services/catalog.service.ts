@@ -49,4 +49,10 @@ export const catalogService = {
   async removeAuthor(id: string): Promise<void> {
     await apiClient.delete(`/authors/${id}`);
   },
+  async uploadAuthorPhoto(id: string, file: File): Promise<Author> {
+    const formData = new FormData();
+    formData.append('photo', file);
+    const res = await apiClient.post<ApiSuccessResponse<Author>>(`/authors/${id}/photo`, formData);
+    return res.data.data;
+  },
 };
