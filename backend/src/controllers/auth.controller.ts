@@ -69,6 +69,11 @@ export const AuthController = {
     return ApiResponse.success(res, user, 'Profil mis à jour');
   }),
 
+  memberPortal: asyncHandler(async (req: Request, res: Response) => {
+    const member = await AuthService.getMemberPortal(req.user!.id);
+    return ApiResponse.success(res, member, 'Espace adhérent');
+  }),
+
   forgotPassword: asyncHandler(async (req: Request, res: Response) => {
     await AuthService.forgotPassword(req.body.email);
     return ApiResponse.success(res, null, 'Si un compte existe pour cet email, un lien de réinitialisation a été envoyé');

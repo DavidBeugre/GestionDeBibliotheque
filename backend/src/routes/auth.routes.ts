@@ -27,6 +27,7 @@ router.post('/logout', AuthController.logout);
 router.post('/logout-all', authenticate, AuthController.logoutAll);
 router.get('/me', authenticate, AuthController.me);
 router.patch('/me', authenticate, updateProfileValidator, validate, AuthController.updateProfile);
+router.get('/member-portal', authenticate, AuthController.memberPortal);
 router.post('/change-password', authenticate, changePasswordValidator, validate, AuthController.changePassword);
 router.get('/sessions', authenticate, AuthController.listSessions);
 router.delete('/sessions/:sessionId', authenticate, sessionIdParamValidator, validate, AuthController.revokeSession);

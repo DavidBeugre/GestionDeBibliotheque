@@ -149,6 +149,19 @@ export interface Fine {
   borrow?: Borrow;
 }
 
+export interface MemberPortal {
+  id: string;
+  matricule: string;
+  cardNumber: string | null;
+  memberType: MemberType;
+  status: MemberStatus;
+  subscriptionExpiry: string | null;
+  user: Member['user'];
+  borrows: Array<Pick<Borrow, 'id' | 'dueDate' | 'status' | 'renewalCount'> & { bookCopy: { book: { id: string; title: string } } }>;
+  reservations: Array<Pick<Reservation, 'id' | 'expiryDate' | 'status'> & { book: { id: string; title: string } }>;
+  fines: Array<Pick<Fine, 'id' | 'amount' | 'reason' | 'status'> & { borrow: { bookCopy: { book: { id: string; title: string } } } }>;
+}
+
 export interface Notification {
   id: string;
   type: string;

@@ -37,6 +37,33 @@ export class MemberRepository {
     return prisma.member.findUnique({ where: { userId }, include: memberInclude });
   }
 
+  static findPortalByUserId(userId: string) {
+    return prisma.member.findUnique({
+      where: { userId },
+      include: {
+        user: { select: { id: true, email: true, firstName: true, lastName: true, phone: true, avatarUrl: true } },
+        borrows: {
+          where: { status: { in: ['ONGOING', 'LATE', 'RENEWED'] } },
+          orderBy: { dueDate: 'asc' },
+          take: 10,
+          include: { bookCopy: { include: { book: true } } },
+        },
+        reservations: {
+          where: { status: { in: ['PENDING', 'AVAILABLE'] } },
+          orderBy: { reservationDate: 'desc' },
+          take: 10,
+          include: { book: true },
+        },
+        fines: {
+          where: { status: { in: ['UNPAID', 'PARTIALLY_PAID'] } },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+          include: { borrow: { include: { bookCopy: { include: { book: true } } } } },
+        },
+      },
+    });
+  }
+
   static findByMatricule(matricule: string) {
     return prisma.member.findUnique({ where: { matricule } });
   }

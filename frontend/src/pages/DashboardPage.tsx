@@ -14,10 +14,13 @@ import { StatCard } from '@/components/dashboard/StatCard';
 import { MonthlyBorrowsChart } from '@/components/dashboard/MonthlyBorrowsChart';
 import { RecentActivityFeed } from '@/components/dashboard/RecentActivityFeed';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { dashboardService } from '@/services/dashboard.service';
+import { memberPortalService } from '@/services/memberPortal.service';
 import { queryKeys, ROLE_LABELS } from '@/constants';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
+import { BORROW_STATUS_CONFIG, FINE_STATUS_CONFIG } from '@/utils/statusConfig';
 
 function StaffDashboard() {
   const statsQuery = useQuery({
@@ -86,6 +89,37 @@ function StaffDashboard() {
 }
 
 function ReaderDashboard() {
+  const portalQuery = useQuery({ queryKey: ['member-portal'], queryFn: memberPortalService.get });
+
+  if (portalQuery.isLoading) {
+    return <Card><CardContent className="py-10 text-sm text-muted-foreground">Chargement de votre espace personnel…</CardContent></Card>;
+  }
+  if (portalQuery.isError || !portalQuery.data) {
+    return <Card className="border-destructive/30"><CardContent className="py-6 text-sm text-destructive">{getApiErrorMessage(portalQuery.error, 'Impossible de charger votre espace personnel')}</CardContent></Card>;
+  }
+
+  const portal = portalQuery.data;
+  const formatDate = (value: string) => new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(new Date(value));
+  const totalDue = portal.fines.reduce((sum, fine) => sum + Number(fine.amount), 0);
+
+  if (portal) {
+    return (
+      <div className="space-y-6">
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Card><CardContent className="py-5"><p className="text-sm text-muted-foreground">Emprunts en cours</p><p className="mt-1 font-data text-3xl font-semibold">{portal.borrows.length}</p></CardContent></Card>
+          <Card><CardContent className="py-5"><p className="text-sm text-muted-foreground">Réservations actives</p><p className="mt-1 font-data text-3xl font-semibold">{portal.reservations.length}</p></CardContent></Card>
+          <Card><CardContent className="py-5"><p className="text-sm text-muted-foreground">Amendes à régulariser</p><p className="mt-1 font-data text-3xl font-semibold">{totalDue}</p></CardContent></Card>
+        </div>
+        <Card className="card-spine pl-1"><CardContent className="py-5"><div className="flex flex-wrap items-center justify-between gap-2"><div><p className="font-medium">Carte d’adhérent</p><p className="text-sm text-muted-foreground">{portal.matricule} · {portal.cardNumber ?? 'Carte en préparation'}</p></div><Badge variant={portal.status === 'ACTIVE' ? 'success' : 'warning'}>{portal.status === 'ACTIVE' ? 'Adhésion active' : portal.status}</Badge></div>{portal.subscriptionExpiry && <p className="mt-3 text-sm text-muted-foreground">Valable jusqu’au {formatDate(portal.subscriptionExpiry)}</p>}</CardContent></Card>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card><CardContent className="py-5"><h2 className="font-display font-semibold">Mes emprunts</h2><div className="mt-4 space-y-3">{portal.borrows.length === 0 ? <p className="text-sm text-muted-foreground">Aucun emprunt en cours.</p> : portal.borrows.map((borrow) => <div key={borrow.id} className="flex items-start justify-between gap-3 border-b pb-3 last:border-0 last:pb-0"><div><p className="text-sm font-medium">{borrow.bookCopy.book.title}</p><p className="text-xs text-muted-foreground">Retour prévu le {formatDate(borrow.dueDate)}</p></div><Badge variant={BORROW_STATUS_CONFIG[borrow.status]?.variant}>{BORROW_STATUS_CONFIG[borrow.status]?.label ?? borrow.status}</Badge></div>)}</div></CardContent></Card>
+          <Card><CardContent className="py-5"><h2 className="font-display font-semibold">Mes réservations</h2><div className="mt-4 space-y-3">{portal.reservations.length === 0 ? <p className="text-sm text-muted-foreground">Aucune réservation active.</p> : portal.reservations.map((reservation) => <div key={reservation.id} className="flex items-start justify-between gap-3 border-b pb-3 last:border-0 last:pb-0"><div><p className="text-sm font-medium">{reservation.book.title}</p><p className="text-xs text-muted-foreground">Expire le {formatDate(reservation.expiryDate)}</p></div><Badge variant={reservation.status === 'AVAILABLE' ? 'success' : 'warning'}>{reservation.status === 'AVAILABLE' ? 'Disponible' : 'En attente'}</Badge></div>)}</div></CardContent></Card>
+        </div>
+        <Card><CardContent className="py-5"><h2 className="font-display font-semibold">Mes amendes</h2><div className="mt-4 space-y-3">{portal.fines.length === 0 ? <p className="text-sm text-muted-foreground">Aucune amende à régulariser.</p> : portal.fines.map((fine) => <div key={fine.id} className="flex items-start justify-between gap-3 border-b pb-3 last:border-0 last:pb-0"><div><p className="text-sm font-medium">{fine.borrow.bookCopy.book.title}</p><p className="text-xs text-muted-foreground">{fine.reason ?? 'Amende bibliothèque'}</p></div><div className="text-right"><p className="text-sm font-semibold">{fine.amount}</p><Badge variant={FINE_STATUS_CONFIG[fine.status]?.variant}>{FINE_STATUS_CONFIG[fine.status]?.label ?? fine.status}</Badge></div></div>)}</div></CardContent></Card>
+      </div>
+    );
+  }
+
   return (
     <Card>
       <CardContent className="flex flex-col items-center gap-3 py-16 text-center">

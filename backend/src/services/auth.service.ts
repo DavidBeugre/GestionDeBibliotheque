@@ -3,6 +3,7 @@ import { ApiError } from '../utils/ApiError';
 import { comparePassword, hashPassword, isStrongPassword } from '../utils/password.util';
 import { generateOpaqueToken, hashToken } from '../utils/crypto.util';
 import { UserRepository } from '../repositories/user.repository';
+import { MemberRepository } from '../repositories/member.repository';
 import { SessionRepository } from '../repositories/session.repository';
 import { TokenService, AccessTokenPayload } from './token.service';
 import { EmailService } from './email.service';
@@ -228,6 +229,12 @@ export class AuthService {
       email: normalizedEmail,
     });
     return toPublicUser(user);
+  }
+
+  static async getMemberPortal(userId: string) {
+    const member = await MemberRepository.findPortalByUserId(userId);
+    if (!member) throw ApiError.notFound('Aucun profil adhérent associé à ce compte');
+    return member;
   }
 
   static getActiveSessions(userId: string) {
