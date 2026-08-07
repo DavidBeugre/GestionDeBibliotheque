@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -16,6 +17,7 @@ import { catalogService } from '@/services/catalog.service';
 import { memberPortalService } from '@/services/memberPortal.service';
 import { queryKeys } from '@/constants';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
+import type { Book } from '@/types';
 
 export default function MemberCatalogPage() {
   const [searchParams] = useSearchParams();
@@ -24,6 +26,7 @@ export default function MemberCatalogPage() {
   const [categoryId, setCategoryId] = useState<string | undefined>();
   const [sort, setSort] = useState<'createdAt' | 'title' | 'availableCopies'>('createdAt');
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const debouncedSearch = useDebouncedValue(search);
   const queryClient = useQueryClient();
   const params = { page, limit: 12, search: debouncedSearch || undefined, status: 'ACTIVE', categoryId, sort, order };
@@ -69,7 +72,7 @@ export default function MemberCatalogPage() {
         <Card><CardContent className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 xl:grid-cols-3">
           {books.map((book) => {
             const isAvailable = book.availableCopies > 0;
-            return <div key={book.id} className="flex gap-3 rounded-lg border p-3">
+            return <div key={book.id} className="flex cursor-pointer gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/40" onClick={() => setSelectedBook(book)}>
               <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded bg-muted">{book.coverImageUrl ? <img src={book.coverImageUrl} alt="" className="size-full object-cover" /> : <BookOpen className="size-5 text-muted-foreground" />}</div>
               <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{book.title}</p><p className="mt-0.5 truncate text-xs text-muted-foreground">{book.authors?.map((item) => item.author.name).join(', ') || 'Auteur inconnu'}</p>{(book.digitalFileUrl || book.externalLink) && <a className="mt-2 inline-block text-xs font-medium text-primary hover:underline" href={book.digitalFileUrl || book.externalLink || '#'} target="_blank" rel="noreferrer">Lire le livre numérique</a>}<div className="mt-3 flex items-center justify-between gap-2"><Badge variant={isAvailable ? 'success' : 'warning'}>{isAvailable ? `${book.availableCopies} disponible(s)` : 'Indisponible'}</Badge>{isAvailable ? <span className="text-xs text-muted-foreground">À emprunter au comptoir</span> : <Button size="sm" onClick={() => reserveMutation.mutate(book.id)} isLoading={reserveMutation.isPending}>Réserver</Button>}</div></div>
             </div>;
@@ -77,6 +80,11 @@ export default function MemberCatalogPage() {
         </CardContent></Card>
       )}
       {booksQuery.data && <Pagination meta={booksQuery.data.meta} onPageChange={setPage} />}
+      <Dialog open={!!selectedBook} onOpenChange={(open) => { if (!open) setSelectedBook(null); }}>
+        <DialogContent className="max-w-lg">
+          {selectedBook && <><DialogHeader><DialogTitle>{selectedBook.title}</DialogTitle></DialogHeader><div className="space-y-4"><div className="flex gap-4"><div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted">{selectedBook.coverImageUrl ? <img src={selectedBook.coverImageUrl} alt="" className="size-full object-cover" /> : <BookOpen className="size-7 text-muted-foreground" />}</div><div><p className="font-medium">{selectedBook.authors.map((item) => item.author.name).join(', ') || 'Auteur inconnu'}</p><p className="mt-1 text-sm text-muted-foreground">{selectedBook.category?.name || 'Sans catégorie'} · {selectedBook.year || 'Année non renseignée'}</p><Badge className="mt-2" variant={selectedBook.availableCopies > 0 ? 'success' : 'warning'}>{selectedBook.availableCopies > 0 ? `${selectedBook.availableCopies} exemplaire(s) disponible(s)` : 'Indisponible'}</Badge></div></div><p className="text-sm leading-relaxed text-muted-foreground">{selectedBook.summary || 'Aucun résumé renseigné pour ce livre.'}</p>{(selectedBook.digitalFileUrl || selectedBook.externalLink) && <Button asChild><a href={selectedBook.digitalFileUrl || selectedBook.externalLink || '#'} target="_blank" rel="noreferrer">Lire le livre numérique</a></Button>}</div></>}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
