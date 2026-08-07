@@ -25,6 +25,7 @@ import ScannerPage from '@/pages/ScannerPage';
 import ProfilePage from '@/pages/ProfilePage';
 import MemberCatalogPage from '@/pages/MemberCatalogPage';
 import MemberHistoryPage from '@/pages/MemberHistoryPage';
+import AuthorsPage from '@/pages/AuthorsPage';
 
 export const router = createBrowserRouter([
   {
@@ -53,6 +54,7 @@ export const router = createBrowserRouter([
             children: [
               { path: '/books', element: <BooksListPage /> },
               { path: '/books/:id', element: <BookDetailPage /> },
+              { path: '/authors', element: <AuthorsPage /> },
               { path: '/members', element: <MembersListPage /> },
               { path: '/members/:id', element: <MemberDetailPage /> },
               { path: '/borrows', element: <BorrowsListPage /> },

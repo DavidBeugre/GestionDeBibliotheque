@@ -28,4 +28,11 @@ export const catalogService = {
     const res = await apiClient.post<ApiSuccessResponse<Author>>('/authors', payload);
     return res.data.data;
   },
+  async updateAuthor(id: string, payload: { name?: string; nationality?: string }): Promise<Author> {
+    const res = await apiClient.patch<ApiSuccessResponse<Author>>(`/authors/${id}`, payload);
+    return res.data.data;
+  },
+  async removeAuthor(id: string): Promise<void> {
+    await apiClient.delete(`/authors/${id}`);
+  },
 };
