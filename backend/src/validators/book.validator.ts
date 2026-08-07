@@ -3,7 +3,7 @@ import { body, query } from 'express-validator';
 export const createBookValidator = [
   body('title').trim().notEmpty().withMessage('Le titre est requis'),
   body('subtitle').optional({ values: 'falsy' }).isString(),
-  body('isbn').optional({ values: 'falsy' }).isISBN().withMessage('ISBN invalide'),
+  body('isbn').optional({ values: 'falsy' }).isString(),
   body('summary').optional({ values: 'falsy' }).isString(),
   body('description').optional({ values: 'falsy' }).isString(),
   body('categoryId').optional().isUUID(),
@@ -29,7 +29,7 @@ export const createBookValidator = [
 
 export const updateBookValidator = [
   body('title').optional().trim().notEmpty(),
-  body('isbn').optional({ values: 'falsy' }).isISBN(),
+  body('isbn').optional({ values: 'falsy' }).isString(),
   body('categoryId').optional().isUUID(),
   body('publisherId').optional().isUUID(),
   body('authorIds').optional().isArray(),
