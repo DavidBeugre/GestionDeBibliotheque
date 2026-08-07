@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -25,15 +25,19 @@ interface BookFormDialogProps {
 export function BookFormDialog({ open, onOpenChange, book }: BookFormDialogProps) {
   const queryClient = useQueryClient();
   const isEditing = !!book;
+  const [newAuthorName, setNewAuthorName] = useState('');
 
   const categoriesQuery = useQuery({ queryKey: queryKeys.categories, queryFn: catalogService.listCategories, enabled: open });
   const publishersQuery = useQuery({ queryKey: queryKeys.publishers, queryFn: catalogService.listPublishers, enabled: open });
+  const authorsQuery = useQuery({ queryKey: queryKeys.authors(), queryFn: () => catalogService.listAuthors(), enabled: open });
 
   const {
     register,
     handleSubmit,
     reset,
     control,
+    getValues,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<BookFormSchema>({ resolver: zodResolver(bookFormSchema) });
 
@@ -46,6 +50,7 @@ export function BookFormDialog({ open, onOpenChange, book }: BookFormDialogProps
         summary: book?.summary ?? '',
         categoryId: book?.category?.id,
         publisherId: book?.publisher?.id,
+        authorIds: book?.authors?.map(({ author }) => author.id) ?? [],
         year: book?.year ?? undefined,
         language: book?.language ?? '',
         callNumber: book?.callNumber ?? '',
@@ -54,6 +59,17 @@ export function BookFormDialog({ open, onOpenChange, book }: BookFormDialogProps
       });
     }
   }, [open, book, reset]);
+
+  const createAuthorMutation = useMutation({
+    mutationFn: (name: string) => catalogService.createAuthor({ name }),
+    onSuccess: (author) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.authors() });
+      setValue('authorIds', [...(getValues('authorIds') ?? []), author.id], { shouldDirty: true });
+      setNewAuthorName('');
+      toast.success('Auteur ajout\u00e9 et s\u00e9lectionn\u00e9');
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error, "Impossible d'ajouter l'auteur")),
+  });
 
   const mutation = useMutation({
     mutationFn: (values: BookFormSchema) =>
@@ -138,6 +154,34 @@ export function BookFormDialog({ open, onOpenChange, book }: BookFormDialogProps
                   </Select>
                 )}
               />
+            </div>
+
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="authorIds">Auteur(s)</Label>
+              <Controller
+                control={control}
+                name="authorIds"
+                render={({ field }) => (
+                  <select
+                    id="authorIds"
+                    multiple
+                    value={field.value ?? []}
+                    onChange={(event) => field.onChange(Array.from(event.currentTarget.selectedOptions, (option) => option.value))}
+                    className="flex min-h-28 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    {authorsQuery.data?.map((author) => (
+                      <option key={author.id} value={author.id}>{author.name}</option>
+                    ))}
+                  </select>
+                )}
+              />
+              <p className="text-xs text-muted-foreground">S\u00e9lectionnez un ou plusieurs auteurs (Ctrl/Cmd + clic).</p>
+              <div className="flex gap-2">
+                <Input value={newAuthorName} onChange={(event) => setNewAuthorName(event.target.value)} placeholder="Nouvel auteur \u00e0 enregistrer" />
+                <Button type="button" variant="outline" onClick={() => { const name = newAuthorName.trim(); if (name) createAuthorMutation.mutate(name); }} isLoading={createAuthorMutation.isPending} disabled={!newAuthorName.trim()}>
+                  Ajouter
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-1.5">

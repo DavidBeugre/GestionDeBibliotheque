@@ -7,6 +7,7 @@ export const bookFormSchema = z.object({
   summary: z.string().optional(),
   categoryId: z.string().optional(),
   publisherId: z.string().optional(),
+  authorIds: z.array(z.string()).optional(),
   year: z.coerce.number().int().min(0).max(new Date().getFullYear()).optional(),
   language: z.string().optional(),
   callNumber: z.string().optional(),

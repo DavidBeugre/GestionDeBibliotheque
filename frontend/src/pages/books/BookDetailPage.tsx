@@ -238,6 +238,13 @@ export default function BookDetailPage() {
                   {book.summary || 'Aucun résumé renseigné pour ce livre.'}
                 </CardContent>
               </Card>
+              {(book.digitalFileUrl || book.externalLink) && (
+                <Button asChild variant="outline" size="sm" className="mt-4">
+                  <a href={book.digitalFileUrl || book.externalLink || '#'} target="_blank" rel="noreferrer">
+                    <BookOpen className="size-4" /> Lire le livre num\u00e9rique
+                  </a>
+                </Button>
+              )}
             </TabsContent>
 
             <TabsContent value="copies">
