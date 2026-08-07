@@ -29,7 +29,7 @@ export default function AppLayout() {
         <AnimatePresence mode="wait">
           <motion.main
             key={location.pathname}
-            className="container py-5 sm:py-6"
+            className="container px-5 py-5 sm:px-6 sm:py-6"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}

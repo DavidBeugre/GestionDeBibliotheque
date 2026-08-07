@@ -53,7 +53,7 @@ export function Navbar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
   if (!user) return null;
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-card/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-card/80 sm:px-6">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-card/95 px-5 backdrop-blur supports-[backdrop-filter]:bg-card/80 sm:px-6">
       <Button variant="ghost" size="icon" className="lg:hidden" onClick={onOpenMobileNav} aria-label="Ouvrir la navigation">
         <Menu className="size-5" />
       </Button>
