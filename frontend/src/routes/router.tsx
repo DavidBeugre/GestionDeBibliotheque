@@ -23,6 +23,7 @@ import ForbiddenPage from '@/pages/errors/ForbiddenPage';
 import ServerErrorPage from '@/pages/errors/ServerErrorPage';
 import ScannerPage from '@/pages/ScannerPage';
 import ProfilePage from '@/pages/ProfilePage';
+import MemberCatalogPage from '@/pages/MemberCatalogPage';
 
 export const router = createBrowserRouter([
   {
@@ -43,6 +44,7 @@ export const router = createBrowserRouter([
         children: [
           { path: '/', element: <DashboardPage /> },
           { path: '/profile', element: <ProfilePage /> },
+          { path: '/catalogue', element: <MemberCatalogPage /> },
 
           {
             element: <RoleGuard allowedRoles={['ADMIN', 'LIBRARIAN']} />,

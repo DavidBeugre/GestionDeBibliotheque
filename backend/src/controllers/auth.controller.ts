@@ -74,6 +74,16 @@ export const AuthController = {
     return ApiResponse.success(res, member, 'Espace adhérent');
   }),
 
+  createOwnReservation: asyncHandler(async (req: Request, res: Response) => {
+    const reservation = await AuthService.createOwnReservation(req.user!.id, req.params.bookId);
+    return ApiResponse.created(res, reservation, 'Réservation créée avec succès');
+  }),
+
+  cancelOwnReservation: asyncHandler(async (req: Request, res: Response) => {
+    await AuthService.cancelOwnReservation(req.user!.id, req.params.reservationId);
+    return ApiResponse.success(res, null, 'Réservation annulée');
+  }),
+
   forgotPassword: asyncHandler(async (req: Request, res: Response) => {
     await AuthService.forgotPassword(req.body.email);
     return ApiResponse.success(res, null, 'Si un compte existe pour cet email, un lien de réinitialisation a été envoyé');

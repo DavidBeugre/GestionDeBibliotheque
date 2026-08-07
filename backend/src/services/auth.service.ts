@@ -4,6 +4,7 @@ import { comparePassword, hashPassword, isStrongPassword } from '../utils/passwo
 import { generateOpaqueToken, hashToken } from '../utils/crypto.util';
 import { UserRepository } from '../repositories/user.repository';
 import { MemberRepository } from '../repositories/member.repository';
+import { ReservationService } from './reservation.service';
 import { SessionRepository } from '../repositories/session.repository';
 import { TokenService, AccessTokenPayload } from './token.service';
 import { EmailService } from './email.service';
@@ -235,6 +236,19 @@ export class AuthService {
     const member = await MemberRepository.findPortalByUserId(userId);
     if (!member) throw ApiError.notFound('Aucun profil adhérent associé à ce compte');
     return member;
+  }
+
+  static async createOwnReservation(userId: string, bookId: string) {
+    const member = await MemberRepository.findByUserId(userId);
+    if (!member) throw ApiError.notFound('Aucun profil adhérent associé à ce compte');
+    return ReservationService.create(member.id, bookId);
+  }
+
+  static async cancelOwnReservation(userId: string, reservationId: string): Promise<void> {
+    const member = await MemberRepository.findByUserId(userId);
+    const reservation = await ReservationService.getById(reservationId);
+    if (!member || reservation.memberId !== member.id) throw ApiError.forbidden('Cette réservation ne vous appartient pas');
+    await ReservationService.cancel(reservationId);
   }
 
   static getActiveSessions(userId: string) {

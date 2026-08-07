@@ -6,4 +6,12 @@ export const memberPortalService = {
     const response = await apiClient.get<ApiSuccessResponse<MemberPortal>>('/auth/member-portal');
     return response.data.data;
   },
+
+  async reserve(bookId: string): Promise<void> {
+    await apiClient.post(`/auth/member-portal/reservations/${bookId}`);
+  },
+
+  async cancelReservation(reservationId: string): Promise<void> {
+    await apiClient.delete(`/auth/member-portal/reservations/${reservationId}`);
+  },
 };

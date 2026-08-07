@@ -3,6 +3,7 @@ import { AuthController } from '../controllers/auth.controller';
 import { authenticate } from '../middlewares/auth.middleware';
 import { authRateLimiter } from '../middlewares/rateLimiter.middleware';
 import { validate } from '../middlewares/validate.middleware';
+import { uuidParamValidator } from '../validators/common.validator';
 import {
   changePasswordValidator,
   forgotPasswordValidator,
@@ -28,6 +29,8 @@ router.post('/logout-all', authenticate, AuthController.logoutAll);
 router.get('/me', authenticate, AuthController.me);
 router.patch('/me', authenticate, updateProfileValidator, validate, AuthController.updateProfile);
 router.get('/member-portal', authenticate, AuthController.memberPortal);
+router.post('/member-portal/reservations/:bookId', authenticate, uuidParamValidator('bookId'), validate, AuthController.createOwnReservation);
+router.delete('/member-portal/reservations/:reservationId', authenticate, uuidParamValidator('reservationId'), validate, AuthController.cancelOwnReservation);
 router.post('/change-password', authenticate, changePasswordValidator, validate, AuthController.changePassword);
 router.get('/sessions', authenticate, AuthController.listSessions);
 router.delete('/sessions/:sessionId', authenticate, sessionIdParamValidator, validate, AuthController.revokeSession);
