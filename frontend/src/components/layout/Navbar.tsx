@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Menu, Search, Bell, Moon, Sun, LogOut, User as UserIcon, Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ROLE_LABELS } from '@/constants';
+import { notificationService } from '@/services/notification.service';
 
 function initials(firstName: string, lastName: string): string {
   return `${firstName?.[0] ?? ''}${lastName?.[0] ?? ''}`.toUpperCase();
@@ -24,6 +26,14 @@ export function Navbar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const notificationsQuery = useQuery({ queryKey: ['notifications', 'menu'], queryFn: notificationService.list, refetchInterval: 60000 });
+  const unreadCountQuery = useQuery({ queryKey: ['notifications', 'unread-count'], queryFn: notificationService.unreadCount, refetchInterval: 60000 });
+  const refreshNotifications = () => {
+    queryClient.invalidateQueries({ queryKey: ['notifications'] });
+  };
+  const markReadMutation = useMutation({ mutationFn: notificationService.markRead, onSuccess: refreshNotifications });
+  const markAllMutation = useMutation({ mutationFn: notificationService.markAllRead, onSuccess: refreshNotifications });
 
   const handleLogout = async () => {
     await logout();
@@ -49,10 +59,28 @@ export function Navbar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
           {theme === 'light' ? <Moon className="size-4" /> : <Sun className="size-4" />}
         </Button>
 
-        <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
-          <Bell className="size-4" />
-          <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-accent" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
+              <Bell className="size-4" />
+              {(unreadCountQuery.data ?? 0) > 0 && <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-accent" />}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-80">
+            <div className="flex items-center justify-between px-2 py-1.5">
+              <DropdownMenuLabel className="p-0">Notifications</DropdownMenuLabel>
+              {(unreadCountQuery.data ?? 0) > 0 && <button className="text-xs text-primary hover:underline" onClick={() => markAllMutation.mutate()}>Tout lire</button>}
+            </div>
+            <DropdownMenuSeparator />
+            {notificationsQuery.isLoading ? <p className="px-2 py-4 text-center text-sm text-muted-foreground">Chargement…</p> : (notificationsQuery.data?.items.length ?? 0) === 0 ? <p className="px-2 py-5 text-center text-sm text-muted-foreground">Aucune notification.</p> : notificationsQuery.data!.items.map((notification) => (
+              <DropdownMenuItem key={notification.id} className="flex cursor-pointer flex-col items-start gap-1 whitespace-normal py-2" onClick={() => { if (!notification.isRead) markReadMutation.mutate(notification.id); if (notification.link) navigate(notification.link); }}>
+                <div className="flex w-full items-start justify-between gap-2"><span className="font-medium">{notification.title}</span>{!notification.isRead && <span className="mt-1 size-2 shrink-0 rounded-full bg-primary" />}</div>
+                <span className="text-xs text-muted-foreground">{notification.message}</span>
+                <span className="text-[11px] text-muted-foreground">{new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(notification.createdAt))}</span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
