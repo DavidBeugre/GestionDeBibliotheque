@@ -17,6 +17,7 @@ import { RecentActivityFeed } from '@/components/dashboard/RecentActivityFeed';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { TypewriterText } from '@/components/common/TypewriterText';
 import { useAuth } from '@/contexts/AuthContext';
 import { dashboardService } from '@/services/dashboard.service';
 import { memberPortalService } from '@/services/memberPortal.service';
@@ -149,7 +150,7 @@ export default function DashboardPage() {
       <div>
         <h1 className="font-display text-2xl font-semibold">Bonjour {user?.firstName} 👋</h1>
         <p className="text-sm text-muted-foreground">
-          Connecté en tant que {ROLE_LABELS[user?.role ?? ''] ?? user?.role}.
+          <TypewriterText text={hasRole('ADMIN', 'LIBRARIAN') ? `Pilotez Shelfly en tant que ${ROLE_LABELS[user?.role ?? ''] ?? user?.role}.` : 'Consultez vos emprunts, réservations et votre carte adhérent.'} />
         </p>
       </div>
 

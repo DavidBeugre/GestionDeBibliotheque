@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { SidebarContent } from '@/components/layout/SidebarContent';
 import { Navbar } from '@/components/layout/Navbar';
 
 export default function AppLayout() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const location = useLocation();
 
   return (
     <div className="min-h-screen bg-surface">
@@ -24,9 +26,18 @@ export default function AppLayout() {
 
       <div className="lg:pl-64">
         <Navbar onOpenMobileNav={() => setMobileNavOpen(true)} />
-        <main className="container py-6">
-          <Outlet />
-        </main>
+        <AnimatePresence mode="wait">
+          <motion.main
+            key={location.pathname}
+            className="container py-5 sm:py-6"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
+            <Outlet />
+          </motion.main>
+        </AnimatePresence>
       </div>
     </div>
   );
