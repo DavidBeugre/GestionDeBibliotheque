@@ -24,6 +24,7 @@ import ServerErrorPage from '@/pages/errors/ServerErrorPage';
 import ScannerPage from '@/pages/ScannerPage';
 import ProfilePage from '@/pages/ProfilePage';
 import MemberCatalogPage from '@/pages/MemberCatalogPage';
+import MemberHistoryPage from '@/pages/MemberHistoryPage';
 
 export const router = createBrowserRouter([
   {
@@ -45,6 +46,7 @@ export const router = createBrowserRouter([
           { path: '/', element: <DashboardPage /> },
           { path: '/profile', element: <ProfilePage /> },
           { path: '/catalogue', element: <MemberCatalogPage /> },
+          { path: '/my-history', element: <MemberHistoryPage /> },
 
           {
             element: <RoleGuard allowedRoles={['ADMIN', 'LIBRARIAN']} />,

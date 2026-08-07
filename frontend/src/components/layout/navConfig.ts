@@ -23,6 +23,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { label: 'Tableau de bord', path: '/', icon: LayoutDashboard },
   { label: 'Catalogue', path: '/catalogue', icon: BookOpen, roles: ['READER'] },
+  { label: 'Mon historique', path: '/my-history', icon: Clock3, roles: ['READER'] },
   { label: 'Livres', path: '/books', icon: BookOpen, roles: ['ADMIN', 'LIBRARIAN'] },
   { label: 'Adhérents', path: '/members', icon: Users, roles: ['ADMIN', 'LIBRARIAN'] },
   { label: 'Emprunts', path: '/borrows', icon: Clock3, roles: ['ADMIN', 'LIBRARIAN'] },
