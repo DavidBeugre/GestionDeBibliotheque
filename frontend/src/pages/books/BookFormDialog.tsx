@@ -162,20 +162,27 @@ export function BookFormDialog({ open, onOpenChange, book }: BookFormDialogProps
                 control={control}
                 name="authorIds"
                 render={({ field }) => (
-                  <select
-                    id="authorIds"
-                    multiple
-                    value={field.value ?? []}
-                    onChange={(event) => field.onChange(Array.from(event.currentTarget.selectedOptions, (option) => option.value))}
-                    className="flex min-h-28 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  >
+                  <div id="authorIds" className="grid max-h-40 grid-cols-1 gap-1.5 overflow-y-auto rounded-md border border-input bg-background p-3 sm:grid-cols-2">
                     {authorsQuery.data?.map((author) => (
-                      <option key={author.id} value={author.id}>{author.name}</option>
+                      <label key={author.id} className="flex cursor-pointer items-center gap-2 rounded px-1 py-1 text-sm hover:bg-muted">
+                        <input
+                          type="checkbox"
+                          checked={(field.value ?? []).includes(author.id)}
+                          onChange={() => {
+                            const selected = field.value ?? [];
+                            field.onChange(selected.includes(author.id)
+                              ? selected.filter((id) => id !== author.id)
+                              : [...selected, author.id]);
+                          }}
+                        />
+                        <span>{author.name}</span>
+                      </label>
                     ))}
-                  </select>
+                    {!authorsQuery.data?.length && <p className="text-sm text-muted-foreground">Aucun auteur enregistr\u00e9 pour le moment.</p>}
+                  </div>
                 )}
               />
-              <p className="text-xs text-muted-foreground">S\u00e9lectionnez un ou plusieurs auteurs (Ctrl/Cmd + clic).</p>
+              <p className="text-xs text-muted-foreground">Cochez les auteurs du livre. D\u00e9cochez un nom pour le retirer.</p>
               <div className="flex gap-2">
                 <Input value={newAuthorName} onChange={(event) => setNewAuthorName(event.target.value)} placeholder="Nouvel auteur \u00e0 enregistrer" />
                 <Button type="button" variant="outline" onClick={() => { const name = newAuthorName.trim(); if (name) createAuthorMutation.mutate(name); }} isLoading={createAuthorMutation.isPending} disabled={!newAuthorName.trim()}>
