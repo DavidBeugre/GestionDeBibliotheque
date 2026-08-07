@@ -264,7 +264,8 @@ export class AuthService {
   static async getOwnHistory(userId: string) {
     const member = await MemberRepository.findByUserId(userId);
     if (!member) throw ApiError.notFound('Aucun profil adhérent associé à ce compte');
-    return MemberRepository.getHistory(member.id);
+    const [borrows, reservations, fines] = await MemberRepository.getHistory(member.id);
+    return { borrows, reservations, fines };
   }
 
   static async generateOwnMemberCardPdf(userId: string) {
