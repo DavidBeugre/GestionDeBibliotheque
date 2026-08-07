@@ -12,6 +12,8 @@ export const bookFormSchema = z.object({
   callNumber: z.string().optional(),
   location: z.string().optional(),
   pageCount: z.coerce.number().int().positive().optional(),
+  digitalFileUrl: z.string().url('Lien invalide').optional().or(z.literal('')),
+  externalLink: z.string().url('Lien invalide').optional().or(z.literal('')),
 });
 
 export type BookFormSchema = z.infer<typeof bookFormSchema>;

@@ -28,6 +28,8 @@ export interface BookFormValues {
   callNumber?: string;
   location?: string;
   price?: number;
+  digitalFileUrl?: string;
+  externalLink?: string;
 }
 
 export const bookService = {

@@ -152,6 +152,8 @@ export function BookFormDialog({ open, onOpenChange, book }: BookFormDialogProps
               <Label htmlFor="summary">Résumé</Label>
               <Textarea id="summary" rows={3} {...register('summary')} />
             </div>
+            <div className="space-y-1.5 sm:col-span-2"><Label htmlFor="digitalFileUrl">Lien du livre numérique (PDF)</Label><Input id="digitalFileUrl" type="url" placeholder="https://..." {...register('digitalFileUrl')} /></div>
+            <div className="space-y-1.5 sm:col-span-2"><Label htmlFor="externalLink">Lien externe de lecture</Label><Input id="externalLink" type="url" placeholder="https://..." {...register('externalLink')} /></div>
           </div>
 
           <DialogFooter>
