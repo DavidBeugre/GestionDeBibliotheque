@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { BookOpen, LayoutGrid, List, MoreHorizontal, Plus, Search } from 'lucide-react';
@@ -33,10 +33,11 @@ type ViewMode = 'table' | 'grid';
 
 export default function BooksListPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { hasPermission } = useAuth();
 
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(() => searchParams.get('search') ?? '');
   const [categoryId, setCategoryId] = useState<string | undefined>();
   const [status, setStatus] = useState<string | undefined>();
   const [page, setPage] = useState(1);
@@ -46,6 +47,11 @@ export default function BooksListPage() {
   const [deletingBook, setDeletingBook] = useState<Book | null>(null);
 
   const debouncedSearch = useDebouncedValue(search);
+
+  useEffect(() => {
+    setSearch(searchParams.get('search') ?? '');
+    setPage(1);
+  }, [searchParams]);
 
   const categoriesQuery = useQuery({ queryKey: queryKeys.categories, queryFn: catalogService.listCategories });
 

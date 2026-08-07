@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { BookOpen, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -15,7 +16,8 @@ import { queryKeys } from '@/constants';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 export default function MemberCatalogPage() {
-  const [search, setSearch] = useState('');
+  const [searchParams] = useSearchParams();
+  const [search, setSearch] = useState(() => searchParams.get('search') ?? '');
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebouncedValue(search);
   const queryClient = useQueryClient();
@@ -32,6 +34,11 @@ export default function MemberCatalogPage() {
   });
 
   const books = booksQuery.data?.items ?? [];
+
+  useEffect(() => {
+    setSearch(searchParams.get('search') ?? '');
+    setPage(1);
+  }, [searchParams]);
 
   return (
     <div className="space-y-5">

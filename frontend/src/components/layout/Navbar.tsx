@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Menu, Search, Bell, Moon, Sun, LogOut, User as UserIcon, Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -26,6 +27,7 @@ export function Navbar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const [globalSearch, setGlobalSearch] = useState('');
   const queryClient = useQueryClient();
   const notificationsQuery = useQuery({ queryKey: ['notifications', 'menu'], queryFn: notificationService.list, refetchInterval: 60000 });
   const unreadCountQuery = useQuery({ queryKey: ['notifications', 'unread-count'], queryFn: notificationService.unreadCount, refetchInterval: 60000 });
@@ -41,6 +43,13 @@ export function Navbar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
     navigate('/login', { replace: true });
   };
 
+  const submitGlobalSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== 'Enter') return;
+    const search = globalSearch.trim();
+    const catalogPath = user?.role === 'READER' ? '/catalogue' : '/books';
+    navigate(search ? `${catalogPath}?search=${encodeURIComponent(search)}` : catalogPath);
+  };
+
   if (!user) return null;
 
   return (
@@ -51,7 +60,7 @@ export function Navbar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
 
       <div className="relative max-w-md flex-1">
         <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input placeholder="Rechercher un livre, un adhérent…" className="pl-9" aria-label="Recherche globale" />
+        <Input placeholder="Rechercher un livre, un auteur ou un ISBN…" className="pl-9" aria-label="Recherche dans le catalogue" value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)} onKeyDown={submitGlobalSearch} />
       </div>
 
       <div className="ml-auto flex items-center gap-1.5">
@@ -100,9 +109,9 @@ export function Navbar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
             <DropdownMenuItem onClick={() => navigate('/profile')}>
               <UserIcon className="size-4" /> Mon profil
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/settings')}>
+            {user.role === 'ADMIN' && <DropdownMenuItem onClick={() => navigate('/settings')}>
               <Settings className="size-4" /> Paramètres
-            </DropdownMenuItem>
+            </DropdownMenuItem>}
             <DropdownMenuSeparator />
             <DropdownMenuItem destructive onClick={handleLogout}>
               <LogOut className="size-4" /> Se déconnecter
