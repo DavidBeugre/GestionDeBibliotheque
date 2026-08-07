@@ -29,7 +29,7 @@ export function Navbar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
   const navigate = useNavigate();
   const [globalSearch, setGlobalSearch] = useState('');
   const queryClient = useQueryClient();
-  const notificationsQuery = useQuery({ queryKey: ['notifications', 'menu'], queryFn: notificationService.list, refetchInterval: 60000 });
+  const notificationsQuery = useQuery({ queryKey: ['notifications', 'menu'], queryFn: () => notificationService.list(), refetchInterval: 60000 });
   const unreadCountQuery = useQuery({ queryKey: ['notifications', 'unread-count'], queryFn: notificationService.unreadCount, refetchInterval: 60000 });
   const refreshNotifications = () => {
     queryClient.invalidateQueries({ queryKey: ['notifications'] });

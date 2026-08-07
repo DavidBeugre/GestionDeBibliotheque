@@ -2,8 +2,8 @@ import { apiClient } from './apiClient';
 import type { ApiSuccessResponse, Notification, PaginationMeta } from '@/types';
 
 export const notificationService = {
-  async list(): Promise<{ items: Notification[]; meta: PaginationMeta }> {
-    const response = await apiClient.get<ApiSuccessResponse<Notification[]>>('/notifications', { params: { page: 1, limit: 8 } });
+  async list(params: { page?: number; limit?: number } = {}): Promise<{ items: Notification[]; meta: PaginationMeta }> {
+    const response = await apiClient.get<ApiSuccessResponse<Notification[]>>('/notifications', { params: { page: params.page ?? 1, limit: params.limit ?? 8 } });
     return { items: response.data.data, meta: response.data.pagination! };
   },
 
@@ -18,5 +18,8 @@ export const notificationService = {
 
   async markAllRead(): Promise<void> {
     await apiClient.patch('/notifications/read-all');
+  },
+  async remove(id: string): Promise<void> {
+    await apiClient.delete(`/notifications/${id}`);
   },
 };
