@@ -7,10 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EmptyState } from '@/components/common/EmptyState';
 import { Pagination } from '@/components/common/Pagination';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { bookService } from '@/services/book.service';
+import { catalogService } from '@/services/catalog.service';
 import { memberPortalService } from '@/services/memberPortal.service';
 import { queryKeys } from '@/constants';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
@@ -19,10 +21,14 @@ export default function MemberCatalogPage() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(() => searchParams.get('search') ?? '');
   const [page, setPage] = useState(1);
+  const [categoryId, setCategoryId] = useState<string | undefined>();
+  const [sort, setSort] = useState<'createdAt' | 'title' | 'availableCopies'>('createdAt');
+  const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   const debouncedSearch = useDebouncedValue(search);
   const queryClient = useQueryClient();
-  const params = { page, limit: 12, search: debouncedSearch || undefined, status: 'ACTIVE' };
+  const params = { page, limit: 12, search: debouncedSearch || undefined, status: 'ACTIVE', categoryId, sort, order };
   const booksQuery = useQuery({ queryKey: queryKeys.books(params), queryFn: () => bookService.list(params) });
+  const categoriesQuery = useQuery({ queryKey: queryKeys.categories, queryFn: catalogService.listCategories });
 
   const reserveMutation = useMutation({
     mutationFn: memberPortalService.reserve,
@@ -44,6 +50,16 @@ export default function MemberCatalogPage() {
     <div className="space-y-5">
       <div>
         <h1 className="font-display text-2xl font-semibold">Catalogue</h1>
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+          <Select value={categoryId ?? 'all'} onValueChange={(value) => { setCategoryId(value === 'all' ? undefined : value); setPage(1); }}>
+            <SelectTrigger className="w-full sm:w-52"><SelectValue placeholder="Toutes catégories" /></SelectTrigger>
+            <SelectContent><SelectItem value="all">Toutes catégories</SelectItem>{categoriesQuery.data?.map((category) => <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>)}</SelectContent>
+          </Select>
+          <Select value={`${sort}:${order}`} onValueChange={(value) => { const [nextSort, nextOrder] = value.split(':') as [typeof sort, typeof order]; setSort(nextSort); setOrder(nextOrder); setPage(1); }}>
+            <SelectTrigger className="w-full sm:w-52"><SelectValue /></SelectTrigger>
+            <SelectContent><SelectItem value="createdAt:desc">Nouveautés</SelectItem><SelectItem value="title:asc">Titre A à Z</SelectItem><SelectItem value="availableCopies:desc">Plus disponibles</SelectItem></SelectContent>
+          </Select>
+        </div>
         <p className="mt-1 text-sm text-muted-foreground">Recherchez un ouvrage et réservez-le lorsqu’il n’est plus disponible.</p>
       </div>
 
