@@ -19,4 +19,8 @@ export const memberPortalService = {
     const response = await apiClient.get<ApiSuccessResponse<{ qrCodeUrl: string }>>('/auth/member-portal/qrcode');
     return response.data.data.qrCodeUrl;
   },
+
+  async renewBorrow(borrowId: string): Promise<void> {
+    await apiClient.post(`/auth/member-portal/borrows/${borrowId}/renew`);
+  },
 };

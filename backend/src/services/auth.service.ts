@@ -5,6 +5,7 @@ import { generateOpaqueToken, hashToken } from '../utils/crypto.util';
 import { UserRepository } from '../repositories/user.repository';
 import { MemberRepository } from '../repositories/member.repository';
 import { ReservationService } from './reservation.service';
+import { BorrowService } from './borrow.service';
 import { generateQrCodeDataUrl } from '../utils/qrcode.util';
 import { SessionRepository } from '../repositories/session.repository';
 import { TokenService, AccessTokenPayload } from './token.service';
@@ -250,6 +251,13 @@ export class AuthService {
     const reservation = await ReservationService.getById(reservationId);
     if (!member || reservation.memberId !== member.id) throw ApiError.forbidden('Cette réservation ne vous appartient pas');
     await ReservationService.cancel(reservationId);
+  }
+
+  static async renewOwnBorrow(userId: string, borrowId: string) {
+    const member = await MemberRepository.findByUserId(userId);
+    const borrow = await BorrowService.getById(borrowId);
+    if (!member || borrow.memberId !== member.id) throw ApiError.forbidden('Cet emprunt ne vous appartient pas');
+    return BorrowService.renew(borrowId);
   }
 
   static async generateOwnMemberQrCode(userId: string): Promise<string> {

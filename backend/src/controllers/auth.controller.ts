@@ -89,6 +89,11 @@ export const AuthController = {
     return ApiResponse.success(res, { qrCodeUrl }, 'QR Code adhérent');
   }),
 
+  renewOwnBorrow: asyncHandler(async (req: Request, res: Response) => {
+    const borrow = await AuthService.renewOwnBorrow(req.user!.id, req.params.borrowId);
+    return ApiResponse.success(res, borrow, 'Emprunt renouvelé');
+  }),
+
   forgotPassword: asyncHandler(async (req: Request, res: Response) => {
     await AuthService.forgotPassword(req.body.email);
     return ApiResponse.success(res, null, 'Si un compte existe pour cet email, un lien de réinitialisation a été envoyé');

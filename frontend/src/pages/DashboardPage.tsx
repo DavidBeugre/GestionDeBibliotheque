@@ -99,6 +99,22 @@ function ReaderDashboard() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['member-portal'] }),
     onError: (error) => toast.error(getApiErrorMessage(error, 'Impossible de générer votre QR Code')),
   });
+  const renewMutation = useMutation({
+    mutationFn: memberPortalService.renewBorrow,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['member-portal'] });
+      toast.success('Emprunt renouvelé');
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Impossible de renouveler cet emprunt')),
+  });
+  const cancelReservationMutation = useMutation({
+    mutationFn: memberPortalService.cancelReservation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['member-portal'] });
+      toast.success('Réservation annulée');
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Impossible d’annuler cette réservation')),
+  });
 
   if (portalQuery.isLoading) {
     return <Card><CardContent className="py-10 text-sm text-muted-foreground">Chargement de votre espace personnel…</CardContent></Card>;
@@ -122,6 +138,7 @@ function ReaderDashboard() {
         <Card><CardContent className="flex flex-col items-center gap-3 py-5 text-center"><p className="font-medium">Mon QR Code d’adhérent</p>{portal.qrCode?.startsWith('data:image/') ? <img src={portal.qrCode} alt="QR Code adhérent" className="size-36 rounded-md border bg-white p-2" /> : <p className="text-sm text-muted-foreground">Générez votre code pour le présenter au comptoir.</p>}<Button size="sm" onClick={() => qrMutation.mutate()} isLoading={qrMutation.isPending}>{portal.qrCode?.startsWith('data:image/') ? 'Actualiser mon QR Code' : 'Générer mon QR Code'}</Button></CardContent></Card>
         <Card className="card-spine pl-1"><CardContent className="py-5"><div className="flex flex-wrap items-center justify-between gap-2"><div><p className="font-medium">Carte d’adhérent</p><p className="text-sm text-muted-foreground">{portal.matricule} · {portal.cardNumber ?? 'Carte en préparation'}</p></div><Badge variant={portal.status === 'ACTIVE' ? 'success' : 'warning'}>{portal.status === 'ACTIVE' ? 'Adhésion active' : portal.status}</Badge></div>{portal.subscriptionExpiry && <p className="mt-3 text-sm text-muted-foreground">Valable jusqu’au {formatDate(portal.subscriptionExpiry)}</p>}</CardContent></Card>
         <div className="grid gap-6 lg:grid-cols-2">
+          {(portal.borrows.some((borrow) => borrow.status === 'ONGOING') || portal.reservations.length > 0) && <Card><CardContent className="py-5"><h2 className="font-display font-semibold">Actions rapides</h2><div className="mt-4 space-y-3">{portal.borrows.filter((borrow) => borrow.status === 'ONGOING').map((borrow) => <div key={borrow.id} className="flex items-center justify-between gap-3"><span className="truncate text-sm">Renouveler : {borrow.bookCopy.book.title}</span><Button size="sm" variant="outline" onClick={() => renewMutation.mutate(borrow.id)} isLoading={renewMutation.isPending}>Renouveler</Button></div>)}{portal.reservations.map((reservation) => <div key={reservation.id} className="flex items-center justify-between gap-3"><span className="truncate text-sm">Annuler : {reservation.book.title}</span><Button size="sm" variant="outline" onClick={() => cancelReservationMutation.mutate(reservation.id)} isLoading={cancelReservationMutation.isPending}>Annuler</Button></div>)}</div></CardContent></Card>}
           <Card><CardContent className="py-5"><h2 className="font-display font-semibold">Mes emprunts</h2><div className="mt-4 space-y-3">{portal.borrows.length === 0 ? <p className="text-sm text-muted-foreground">Aucun emprunt en cours.</p> : portal.borrows.map((borrow) => <div key={borrow.id} className="flex items-start justify-between gap-3 border-b pb-3 last:border-0 last:pb-0"><div><p className="text-sm font-medium">{borrow.bookCopy.book.title}</p><p className="text-xs text-muted-foreground">Retour prévu le {formatDate(borrow.dueDate)}</p></div><Badge variant={BORROW_STATUS_CONFIG[borrow.status]?.variant}>{BORROW_STATUS_CONFIG[borrow.status]?.label ?? borrow.status}</Badge></div>)}</div></CardContent></Card>
           <Card><CardContent className="py-5"><h2 className="font-display font-semibold">Mes réservations</h2><div className="mt-4 space-y-3">{portal.reservations.length === 0 ? <p className="text-sm text-muted-foreground">Aucune réservation active.</p> : portal.reservations.map((reservation) => <div key={reservation.id} className="flex items-start justify-between gap-3 border-b pb-3 last:border-0 last:pb-0"><div><p className="text-sm font-medium">{reservation.book.title}</p><p className="text-xs text-muted-foreground">Expire le {formatDate(reservation.expiryDate)}</p></div><Badge variant={reservation.status === 'AVAILABLE' ? 'success' : 'warning'}>{reservation.status === 'AVAILABLE' ? 'Disponible' : 'En attente'}</Badge></div>)}</div></CardContent></Card>
         </div>
