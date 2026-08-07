@@ -14,4 +14,9 @@ export const memberPortalService = {
   async cancelReservation(reservationId: string): Promise<void> {
     await apiClient.delete(`/auth/member-portal/reservations/${reservationId}`);
   },
+
+  async qrCode(): Promise<string> {
+    const response = await apiClient.get<ApiSuccessResponse<{ qrCodeUrl: string }>>('/auth/member-portal/qrcode');
+    return response.data.data.qrCodeUrl;
+  },
 };

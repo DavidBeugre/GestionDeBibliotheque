@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import {
   BookOpen,
   BookCopy as BookCopyIcon,
@@ -15,6 +16,7 @@ import { MonthlyBorrowsChart } from '@/components/dashboard/MonthlyBorrowsChart'
 import { RecentActivityFeed } from '@/components/dashboard/RecentActivityFeed';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { dashboardService } from '@/services/dashboard.service';
 import { memberPortalService } from '@/services/memberPortal.service';
@@ -89,7 +91,13 @@ function StaffDashboard() {
 }
 
 function ReaderDashboard() {
+  const queryClient = useQueryClient();
   const portalQuery = useQuery({ queryKey: ['member-portal'], queryFn: memberPortalService.get });
+  const qrMutation = useMutation({
+    mutationFn: memberPortalService.qrCode,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['member-portal'] }),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Impossible de générer votre QR Code')),
+  });
 
   if (portalQuery.isLoading) {
     return <Card><CardContent className="py-10 text-sm text-muted-foreground">Chargement de votre espace personnel…</CardContent></Card>;
@@ -110,6 +118,7 @@ function ReaderDashboard() {
           <Card><CardContent className="py-5"><p className="text-sm text-muted-foreground">Réservations actives</p><p className="mt-1 font-data text-3xl font-semibold">{portal.reservations.length}</p></CardContent></Card>
           <Card><CardContent className="py-5"><p className="text-sm text-muted-foreground">Amendes à régulariser</p><p className="mt-1 font-data text-3xl font-semibold">{totalDue}</p></CardContent></Card>
         </div>
+        <Card><CardContent className="flex flex-col items-center gap-3 py-5 text-center"><p className="font-medium">Mon QR Code d’adhérent</p>{portal.qrCode ? <img src={portal.qrCode} alt="QR Code adhérent" className="size-36 rounded-md border bg-white p-2" /> : <p className="text-sm text-muted-foreground">Générez votre code pour le présenter au comptoir.</p>}<Button size="sm" onClick={() => qrMutation.mutate()} isLoading={qrMutation.isPending}>{portal.qrCode ? 'Afficher / actualiser mon QR Code' : 'Générer mon QR Code'}</Button></CardContent></Card>
         <Card className="card-spine pl-1"><CardContent className="py-5"><div className="flex flex-wrap items-center justify-between gap-2"><div><p className="font-medium">Carte d’adhérent</p><p className="text-sm text-muted-foreground">{portal.matricule} · {portal.cardNumber ?? 'Carte en préparation'}</p></div><Badge variant={portal.status === 'ACTIVE' ? 'success' : 'warning'}>{portal.status === 'ACTIVE' ? 'Adhésion active' : portal.status}</Badge></div>{portal.subscriptionExpiry && <p className="mt-3 text-sm text-muted-foreground">Valable jusqu’au {formatDate(portal.subscriptionExpiry)}</p>}</CardContent></Card>
         <div className="grid gap-6 lg:grid-cols-2">
           <Card><CardContent className="py-5"><h2 className="font-display font-semibold">Mes emprunts</h2><div className="mt-4 space-y-3">{portal.borrows.length === 0 ? <p className="text-sm text-muted-foreground">Aucun emprunt en cours.</p> : portal.borrows.map((borrow) => <div key={borrow.id} className="flex items-start justify-between gap-3 border-b pb-3 last:border-0 last:pb-0"><div><p className="text-sm font-medium">{borrow.bookCopy.book.title}</p><p className="text-xs text-muted-foreground">Retour prévu le {formatDate(borrow.dueDate)}</p></div><Badge variant={BORROW_STATUS_CONFIG[borrow.status]?.variant}>{BORROW_STATUS_CONFIG[borrow.status]?.label ?? borrow.status}</Badge></div>)}</div></CardContent></Card>

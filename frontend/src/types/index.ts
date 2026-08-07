@@ -153,6 +153,7 @@ export interface MemberPortal {
   id: string;
   matricule: string;
   cardNumber: string | null;
+  qrCode: string | null;
   memberType: MemberType;
   status: MemberStatus;
   subscriptionExpiry: string | null;

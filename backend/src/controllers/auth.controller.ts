@@ -84,6 +84,11 @@ export const AuthController = {
     return ApiResponse.success(res, null, 'Réservation annulée');
   }),
 
+  ownMemberQrCode: asyncHandler(async (req: Request, res: Response) => {
+    const qrCodeUrl = await AuthService.generateOwnMemberQrCode(req.user!.id);
+    return ApiResponse.success(res, { qrCodeUrl }, 'QR Code adhérent');
+  }),
+
   forgotPassword: asyncHandler(async (req: Request, res: Response) => {
     await AuthService.forgotPassword(req.body.email);
     return ApiResponse.success(res, null, 'Si un compte existe pour cet email, un lien de réinitialisation a été envoyé');

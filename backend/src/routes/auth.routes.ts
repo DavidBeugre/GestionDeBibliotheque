@@ -29,6 +29,7 @@ router.post('/logout-all', authenticate, AuthController.logoutAll);
 router.get('/me', authenticate, AuthController.me);
 router.patch('/me', authenticate, updateProfileValidator, validate, AuthController.updateProfile);
 router.get('/member-portal', authenticate, AuthController.memberPortal);
+router.get('/member-portal/qrcode', authenticate, AuthController.ownMemberQrCode);
 router.post('/member-portal/reservations/:bookId', authenticate, uuidParamValidator('bookId'), validate, AuthController.createOwnReservation);
 router.delete('/member-portal/reservations/:reservationId', authenticate, uuidParamValidator('reservationId'), validate, AuthController.cancelOwnReservation);
 router.post('/change-password', authenticate, changePasswordValidator, validate, AuthController.changePassword);
