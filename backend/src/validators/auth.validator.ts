@@ -26,4 +26,10 @@ export const changePasswordValidator = [
   body('newPassword').isLength({ min: 8 }).withMessage('Le nouveau mot de passe doit contenir au moins 8 caractères'),
 ];
 
+export const updateProfileValidator = [
+  body('email').isEmail().withMessage('Email invalide').normalizeEmail(),
+  body('firstName').trim().notEmpty().withMessage('Le prénom est requis'),
+  body('lastName').trim().notEmpty().withMessage('Le nom est requis'),
+];
+
 export const sessionIdParamValidator = [param('sessionId').isUUID().withMessage('Identifiant de session invalide')];

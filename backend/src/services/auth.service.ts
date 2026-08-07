@@ -214,6 +214,22 @@ export class AuthService {
     await AuditService.record(AuditAction.PASSWORD_CHANGE, { userId });
   }
 
+  static async updateProfile(userId: string, input: { firstName: string; lastName: string; email: string }) {
+    const normalizedEmail = input.email.toLowerCase().trim();
+    const currentUser = await UserRepository.findByIdOrThrow(userId);
+    if (normalizedEmail !== currentUser.email) {
+      const existingUser = await UserRepository.findByEmail(normalizedEmail);
+      if (existingUser) throw ApiError.conflict('Un compte existe déjà avec cet email');
+    }
+
+    const user = await UserRepository.updateProfile(userId, {
+      firstName: input.firstName.trim(),
+      lastName: input.lastName.trim(),
+      email: normalizedEmail,
+    });
+    return toPublicUser(user);
+  }
+
   static getActiveSessions(userId: string) {
     return SessionRepository.listActiveForUser(userId);
   }

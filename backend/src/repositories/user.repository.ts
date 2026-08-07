@@ -43,7 +43,7 @@ export class UserRepository {
         lastName: data.lastName,
         roleId: role.id,
       },
-      include: { role: { include: { permissions: true } } },
+      include: { role: { include: { permissions: true } }, member: true },
     });
   }
 
@@ -76,6 +76,14 @@ export class UserRepository {
         resetPasswordToken: null,
         resetPasswordExpires: null,
       },
+    });
+  }
+
+  static updateProfile(userId: string, data: { firstName: string; lastName: string; email: string }) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: { ...data, email: data.email.toLowerCase().trim() },
+      include: { role: { include: { permissions: true } }, member: true },
     });
   }
 

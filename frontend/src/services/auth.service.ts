@@ -29,6 +29,11 @@ export const authService = {
     return res.data.data;
   },
 
+  async updateProfile(payload: { firstName: string; lastName: string; email: string }): Promise<AuthUser> {
+    const res = await apiClient.patch<ApiSuccessResponse<AuthUser>>('/auth/me', payload);
+    return res.data.data;
+  },
+
   async refresh(): Promise<{ user: AuthUser; accessToken: string } | null> {
     try {
       const res = await apiClient.post<ApiSuccessResponse<AuthResult>>('/auth/refresh-token');

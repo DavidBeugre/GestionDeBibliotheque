@@ -10,6 +10,7 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<AuthUser>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  updateProfile: (payload: { firstName: string; lastName: string; email: string }) => Promise<AuthUser>;
   hasRole: (...roles: RoleName[]) => boolean;
   hasPermission: (code: string) => boolean;
 }
@@ -63,12 +64,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(freshUser);
   };
 
+  const updateProfile = async (payload: { firstName: string; lastName: string; email: string }) => {
+    const updatedUser = await authService.updateProfile(payload);
+    setUser(updatedUser);
+    return updatedUser;
+  };
+
   const hasRole = (...roles: RoleName[]) => !!user && roles.includes(user.role);
   const hasPermission = (code: string) => !!user && user.permissions.includes(code);
 
   return (
     <AuthContext.Provider
-      value={{ user, isLoading, isAuthenticated: !!user, login, logout, refreshUser, hasRole, hasPermission }}
+      value={{ user, isLoading, isAuthenticated: !!user, login, logout, refreshUser, updateProfile, hasRole, hasPermission }}
     >
       {children}
     </AuthContext.Provider>

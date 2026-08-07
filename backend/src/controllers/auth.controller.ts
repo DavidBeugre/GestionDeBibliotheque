@@ -64,6 +64,11 @@ export const AuthController = {
     return ApiResponse.success(res, req.user, 'Utilisateur courant');
   }),
 
+  updateProfile: asyncHandler(async (req: Request, res: Response) => {
+    const user = await AuthService.updateProfile(req.user!.id, req.body);
+    return ApiResponse.success(res, user, 'Profil mis à jour');
+  }),
+
   forgotPassword: asyncHandler(async (req: Request, res: Response) => {
     await AuthService.forgotPassword(req.body.email);
     return ApiResponse.success(res, null, 'Si un compte existe pour cet email, un lien de réinitialisation a été envoyé');

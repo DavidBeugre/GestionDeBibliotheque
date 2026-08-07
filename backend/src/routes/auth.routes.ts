@@ -10,6 +10,7 @@ import {
   registerValidator,
   resetPasswordValidator,
   sessionIdParamValidator,
+  updateProfileValidator,
 } from '../validators/auth.validator';
 
 const router = Router();
@@ -25,6 +26,7 @@ router.post('/reset-password', authRateLimiter, resetPasswordValidator, validate
 router.post('/logout', AuthController.logout);
 router.post('/logout-all', authenticate, AuthController.logoutAll);
 router.get('/me', authenticate, AuthController.me);
+router.patch('/me', authenticate, updateProfileValidator, validate, AuthController.updateProfile);
 router.post('/change-password', authenticate, changePasswordValidator, validate, AuthController.changePassword);
 router.get('/sessions', authenticate, AuthController.listSessions);
 router.delete('/sessions/:sessionId', authenticate, sessionIdParamValidator, validate, AuthController.revokeSession);

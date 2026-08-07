@@ -9,7 +9,6 @@ import LoginPage from '@/pages/auth/LoginPage';
 import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
 import DashboardPage from '@/pages/DashboardPage';
-import ComingSoonPage from '@/pages/ComingSoonPage';
 import BooksListPage from '@/pages/books/BooksListPage';
 import BookDetailPage from '@/pages/books/BookDetailPage';
 import MembersListPage from '@/pages/members/MembersListPage';
@@ -23,6 +22,7 @@ import NotFoundPage from '@/pages/errors/NotFoundPage';
 import ForbiddenPage from '@/pages/errors/ForbiddenPage';
 import ServerErrorPage from '@/pages/errors/ServerErrorPage';
 import ScannerPage from '@/pages/ScannerPage';
+import ProfilePage from '@/pages/ProfilePage';
 
 export const router = createBrowserRouter([
   {
@@ -42,7 +42,7 @@ export const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           { path: '/', element: <DashboardPage /> },
-          { path: '/profile', element: <ComingSoonPage title="Mon profil" step="Étape 9 (finalisation)" /> },
+          { path: '/profile', element: <ProfilePage /> },
 
           {
             element: <RoleGuard allowedRoles={['ADMIN', 'LIBRARIAN']} />,
