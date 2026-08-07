@@ -2,10 +2,10 @@ import { body, query } from 'express-validator';
 
 export const createBookValidator = [
   body('title').trim().notEmpty().withMessage('Le titre est requis'),
-  body('subtitle').optional().isString(),
-  body('isbn').optional().isISBN().withMessage('ISBN invalide'),
-  body('summary').optional().isString(),
-  body('description').optional().isString(),
+  body('subtitle').optional({ values: 'falsy' }).isString(),
+  body('isbn').optional({ values: 'falsy' }).isISBN().withMessage('ISBN invalide'),
+  body('summary').optional({ values: 'falsy' }).isString(),
+  body('description').optional({ values: 'falsy' }).isString(),
   body('categoryId').optional().isUUID(),
   body('publisherId').optional().isUUID(),
   body('authorIds').optional().isArray().withMessage('authorIds doit être un tableau'),
@@ -14,9 +14,9 @@ export const createBookValidator = [
   body('edition').optional().isString(),
   body('year').optional().isInt({ min: 0, max: new Date().getFullYear() }),
   body('pageCount').optional().isInt({ min: 1 }),
-  body('language').optional().isString(),
-  body('callNumber').optional().isString(),
-  body('location').optional().isString(),
+  body('language').optional({ values: 'falsy' }).isString(),
+  body('callNumber').optional({ values: 'falsy' }).isString(),
+  body('location').optional({ values: 'falsy' }).isString(),
   body('condition').optional().isIn(['NEW', 'GOOD', 'WORN', 'DAMAGED', 'LOST']),
   body('price').optional().isFloat({ min: 0 }),
   body('purchaseDate').optional().isISO8601(),
@@ -29,7 +29,7 @@ export const createBookValidator = [
 
 export const updateBookValidator = [
   body('title').optional().trim().notEmpty(),
-  body('isbn').optional().isISBN(),
+  body('isbn').optional({ values: 'falsy' }).isISBN(),
   body('categoryId').optional().isUUID(),
   body('publisherId').optional().isUUID(),
   body('authorIds').optional().isArray(),
