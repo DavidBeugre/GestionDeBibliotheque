@@ -54,6 +54,10 @@ export default function ProfilePage() {
       toast.error('Les deux nouveaux mots de passe ne correspondent pas');
       return;
     }
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}/.test(newPassword)) {
+      toast.error('Le mot de passe doit contenir 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial');
+      return;
+    }
     setSavingPassword(true);
     try {
       await authService.changePassword(oldPassword, newPassword);
@@ -110,7 +114,7 @@ export default function ProfilePage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2"><KeyRound className="size-5" /> Mot de passe</CardTitle>
-          <CardDescription>Utilisez un mot de passe d’au moins 8 caractères.</CardDescription>
+          <CardDescription>Au moins 8 caractères, avec majuscule, minuscule, chiffre et caractère spécial.</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={handlePasswordSubmit}>

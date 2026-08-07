@@ -26,8 +26,12 @@ export default function LoginPage() {
 
   const onSubmit = async (values: LoginFormValues) => {
     try {
-      await login(values.email, values.password);
-      const redirectTo = (location.state as { from?: Location })?.from?.pathname ?? '/';
+      const loggedInUser = await login(values.email, values.password);
+      // Un adhérent ne doit jamais être renvoyé vers une ancienne page réservée
+      // au personnel (ex. /members), qui produirait immédiatement un 403.
+      const redirectTo = loggedInUser.role === 'READER'
+        ? '/'
+        : (location.state as { from?: Location })?.from?.pathname ?? '/';
       navigate(redirectTo, { replace: true });
     } catch (error) {
       toast.error(getApiErrorMessage(error, 'Email ou mot de passe incorrect'));
