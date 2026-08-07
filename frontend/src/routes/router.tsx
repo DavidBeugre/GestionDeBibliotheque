@@ -26,6 +26,7 @@ import ProfilePage from '@/pages/ProfilePage';
 import MemberCatalogPage from '@/pages/MemberCatalogPage';
 import MemberHistoryPage from '@/pages/MemberHistoryPage';
 import AuthorsPage from '@/pages/AuthorsPage';
+import CatalogSettingsPage from '@/pages/CatalogSettingsPage';
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
               { path: '/books', element: <BooksListPage /> },
               { path: '/books/:id', element: <BookDetailPage /> },
               { path: '/authors', element: <AuthorsPage /> },
+              { path: '/catalog-settings', element: <CatalogSettingsPage /> },
               { path: '/members', element: <MembersListPage /> },
               { path: '/members/:id', element: <MemberDetailPage /> },
               { path: '/borrows', element: <BorrowsListPage /> },
