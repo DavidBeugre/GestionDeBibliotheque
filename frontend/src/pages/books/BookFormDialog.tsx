@@ -49,6 +49,8 @@ export function BookFormDialog({ open, onOpenChange, book }: BookFormDialogProps
         year: book?.year ?? undefined,
         language: book?.language ?? '',
         callNumber: book?.callNumber ?? '',
+        digitalFileUrl: book?.digitalFileUrl ?? '',
+        externalLink: book?.externalLink ?? '',
       });
     }
   }, [open, book, reset]);

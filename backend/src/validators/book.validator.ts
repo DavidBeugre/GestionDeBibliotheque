@@ -23,8 +23,8 @@ export const createBookValidator = [
   body('acquisitionSource').optional().isIn(['PURCHASE', 'DONATION', 'EXCHANGE', 'OTHER']),
   body('tags').optional().isArray(),
   body('keywords').optional().isArray(),
-  body('digitalFileUrl').optional().isURL(),
-  body('externalLink').optional().isURL(),
+  body('digitalFileUrl').optional({ values: 'falsy' }).isURL(),
+  body('externalLink').optional({ values: 'falsy' }).isURL(),
 ];
 
 export const updateBookValidator = [
@@ -37,6 +37,8 @@ export const updateBookValidator = [
   body('year').optional().isInt({ min: 0, max: new Date().getFullYear() }),
   body('status').optional().isIn(['ACTIVE', 'ARCHIVED', 'OUT_OF_PRINT']),
   body('condition').optional().isIn(['NEW', 'GOOD', 'WORN', 'DAMAGED', 'LOST']),
+  body('digitalFileUrl').optional({ values: 'falsy' }).isURL(),
+  body('externalLink').optional({ values: 'falsy' }).isURL(),
 ];
 
 export const listBooksValidator = [

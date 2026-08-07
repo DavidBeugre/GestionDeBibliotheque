@@ -75,6 +75,8 @@ export interface Book {
   language: string | null;
   callNumber: string | null;
   coverImageUrl: string | null;
+  digitalFileUrl?: string | null;
+  externalLink?: string | null;
   status: BookStatus;
   totalCopies: number;
   availableCopies: number;
