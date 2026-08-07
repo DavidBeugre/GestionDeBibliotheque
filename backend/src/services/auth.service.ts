@@ -5,8 +5,7 @@ import { generateOpaqueToken, hashToken } from '../utils/crypto.util';
 import { UserRepository } from '../repositories/user.repository';
 import { MemberRepository } from '../repositories/member.repository';
 import { ReservationService } from './reservation.service';
-import { generateQrCodeBuffer } from '../utils/qrcode.util';
-import { uploadBufferToCloudinary } from '../utils/cloudinary.util';
+import { generateQrCodeDataUrl } from '../utils/qrcode.util';
 import { SessionRepository } from '../repositories/session.repository';
 import { TokenService, AccessTokenPayload } from './token.service';
 import { EmailService } from './email.service';
@@ -256,13 +255,12 @@ export class AuthService {
   static async generateOwnMemberQrCode(userId: string): Promise<string> {
     const member = await MemberRepository.findByUserId(userId);
     if (!member) throw ApiError.notFound('Aucun profil adhérent associé à ce compte');
-    if (member.qrCode) return member.qrCode;
+    if (member.qrCode?.startsWith('data:image/')) return member.qrCode;
 
     const payload = JSON.stringify({ type: 'member', id: member.id, matricule: member.matricule });
-    const buffer = await generateQrCodeBuffer(payload);
-    const { url } = await uploadBufferToCloudinary(buffer, 'members/qrcodes');
-    await MemberRepository.updateMember(member.id, { qrCode: url });
-    return url;
+    const qrCode = await generateQrCodeDataUrl(payload);
+    await MemberRepository.updateMember(member.id, { qrCode });
+    return qrCode;
   }
 
   static getActiveSessions(userId: string) {

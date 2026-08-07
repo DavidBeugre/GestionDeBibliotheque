@@ -3,7 +3,7 @@ import { MemberRepository } from '../repositories/member.repository';
 import { ApiError } from '../utils/ApiError';
 import { hashPassword, generateTemporaryPassword } from '../utils/password.util';
 import { uploadBufferToCloudinary } from '../utils/cloudinary.util';
-import { generateQrCodeBuffer } from '../utils/qrcode.util';
+import { generateQrCodeDataUrl } from '../utils/qrcode.util';
 import { EmailService } from './email.service';
 import { AuditService } from './audit.service';
 import { AuditAction } from '@prisma/client';
@@ -164,10 +164,9 @@ export class MemberService {
   static async generateQrCode(id: string) {
     const member = await this.getById(id);
     const payload = JSON.stringify({ type: 'member', id: member.id, matricule: member.matricule });
-    const buffer = await generateQrCodeBuffer(payload);
-    const { url } = await uploadBufferToCloudinary(buffer, 'members/qrcodes');
-    await MemberRepository.updateMember(id, { qrCode: url });
-    return url;
+    const qrCode = await generateQrCodeDataUrl(payload);
+    await MemberRepository.updateMember(id, { qrCode });
+    return qrCode;
   }
 
   static async getHistory(id: string) {
