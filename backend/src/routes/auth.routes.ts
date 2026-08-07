@@ -30,6 +30,8 @@ router.get('/me', authenticate, AuthController.me);
 router.patch('/me', authenticate, updateProfileValidator, validate, AuthController.updateProfile);
 router.get('/member-portal', authenticate, AuthController.memberPortal);
 router.get('/member-portal/qrcode', authenticate, AuthController.ownMemberQrCode);
+router.get('/member-portal/history', authenticate, AuthController.ownHistory);
+router.get('/member-portal/card.pdf', authenticate, AuthController.ownMemberCardPdf);
 router.post('/member-portal/borrows/:borrowId/renew', authenticate, uuidParamValidator('borrowId'), validate, AuthController.renewOwnBorrow);
 router.post('/member-portal/reservations/:bookId', authenticate, uuidParamValidator('bookId'), validate, AuthController.createOwnReservation);
 router.delete('/member-portal/reservations/:reservationId', authenticate, uuidParamValidator('reservationId'), validate, AuthController.cancelOwnReservation);

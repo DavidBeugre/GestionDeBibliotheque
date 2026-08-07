@@ -94,6 +94,18 @@ export const AuthController = {
     return ApiResponse.success(res, borrow, 'Emprunt renouvelé');
   }),
 
+  ownHistory: asyncHandler(async (req: Request, res: Response) => {
+    const history = await AuthService.getOwnHistory(req.user!.id);
+    return ApiResponse.success(res, history, 'Historique adhérent');
+  }),
+
+  ownMemberCardPdf: asyncHandler(async (req: Request, res: Response) => {
+    const pdf = await AuthService.generateOwnMemberCardPdf(req.user!.id);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="carte-shelfly.pdf"');
+    return res.send(pdf);
+  }),
+
   forgotPassword: asyncHandler(async (req: Request, res: Response) => {
     await AuthService.forgotPassword(req.body.email);
     return ApiResponse.success(res, null, 'Si un compte existe pour cet email, un lien de réinitialisation a été envoyé');

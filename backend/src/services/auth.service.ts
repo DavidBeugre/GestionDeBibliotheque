@@ -7,6 +7,7 @@ import { MemberRepository } from '../repositories/member.repository';
 import { ReservationService } from './reservation.service';
 import { BorrowService } from './borrow.service';
 import { generateQrCodeDataUrl } from '../utils/qrcode.util';
+import { createMemberCardPdf } from '../utils/memberCardPdf.util';
 import { SessionRepository } from '../repositories/session.repository';
 import { TokenService, AccessTokenPayload } from './token.service';
 import { EmailService } from './email.service';
@@ -258,6 +259,18 @@ export class AuthService {
     const borrow = await BorrowService.getById(borrowId);
     if (!member || borrow.memberId !== member.id) throw ApiError.forbidden('Cet emprunt ne vous appartient pas');
     return BorrowService.renew(borrowId);
+  }
+
+  static async getOwnHistory(userId: string) {
+    const member = await MemberRepository.findByUserId(userId);
+    if (!member) throw ApiError.notFound('Aucun profil adhérent associé à ce compte');
+    return MemberRepository.getHistory(member.id);
+  }
+
+  static async generateOwnMemberCardPdf(userId: string) {
+    const member = await MemberRepository.findByUserId(userId);
+    if (!member) throw ApiError.notFound('Aucun profil adhérent associé à ce compte');
+    return createMemberCardPdf(member);
   }
 
   static async generateOwnMemberQrCode(userId: string): Promise<string> {

@@ -1,5 +1,5 @@
 import { apiClient } from './apiClient';
-import type { ApiSuccessResponse, MemberPortal } from '@/types';
+import type { ApiSuccessResponse, Borrow, Fine, MemberPortal, Reservation } from '@/types';
 
 export const memberPortalService = {
   async get(): Promise<MemberPortal> {
@@ -22,5 +22,20 @@ export const memberPortalService = {
 
   async renewBorrow(borrowId: string): Promise<void> {
     await apiClient.post(`/auth/member-portal/borrows/${borrowId}/renew`);
+  },
+
+  async history(): Promise<{ borrows: Borrow[]; reservations: Reservation[]; fines: Fine[] }> {
+    const response = await apiClient.get<ApiSuccessResponse<{ borrows: Borrow[]; reservations: Reservation[]; fines: Fine[] }>>('/auth/member-portal/history');
+    return response.data.data;
+  },
+
+  async downloadCardPdf(): Promise<void> {
+    const response = await apiClient.get('/auth/member-portal/card.pdf', { responseType: 'blob' });
+    const url = URL.createObjectURL(response.data as Blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'carte-shelfly.pdf';
+    anchor.click();
+    URL.revokeObjectURL(url);
   },
 };
