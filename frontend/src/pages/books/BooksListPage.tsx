@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { BookOpen, LayoutGrid, List, MoreHorizontal, Plus, Search } from 'lucide-react';
+import { BookOpen, Download, LayoutGrid, List, MoreHorizontal, Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -71,6 +71,45 @@ export default function BooksListPage() {
     onError: (error) => toast.error(getApiErrorMessage(error, "Impossible d'archiver ce livre")),
   });
 
+  const exportMutation = useMutation({
+    mutationFn: async () => {
+      const firstPage = await bookService.list({ page: 1, limit: 100 });
+      const remainingPages = Array.from({ length: Math.max(0, firstPage.meta.totalPages - 1) }, (_, index) =>
+        bookService.list({ page: index + 2, limit: 100 })
+      );
+      const otherPages = await Promise.all(remainingPages);
+      return [
+        ...firstPage.items,
+        ...otherPages.flatMap((response) => response.items),
+      ];
+    },
+    onSuccess: (allBooks) => {
+      const escape = (value: string | number | null | undefined) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+      const rows = [
+        ['Titre', 'Auteurs', 'ISBN', 'Catégorie', 'Éditeur', 'Année', 'Disponibles', 'Total'],
+        ...allBooks.map((book) => [
+          book.title,
+          book.authors.map((item) => item.author.name).join(', '),
+          book.isbn,
+          book.category?.name,
+          book.publisher?.name,
+          book.year,
+          book.availableCopies,
+          book.totalCopies,
+        ]),
+      ];
+      const blob = new Blob([`\uFEFF${rows.map((row) => row.map(escape).join(';')).join('\n')}`], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `shelfly-catalogue-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.success(`${allBooks.length} livre(s) exporté(s)`);
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error, "Impossible d'exporter le catalogue")),
+  });
+
   const canManage = hasPermission(PERMISSIONS.BOOK_CREATE);
   const books = booksQuery.data?.items ?? [];
 
@@ -82,14 +121,19 @@ export default function BooksListPage() {
           <p className="text-sm text-muted-foreground">{booksQuery.data?.meta.total ?? 0} ouvrages au catalogue</p>
         </div>
         {canManage && (
-          <Button
-            onClick={() => {
-              setEditingBook(null);
-              setFormOpen(true);
-            }}
-          >
-            <Plus className="size-4" /> Nouveau livre
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={() => exportMutation.mutate()} isLoading={exportMutation.isPending}>
+              <Download className="size-4" /> Exporter CSV
+            </Button>
+            <Button
+              onClick={() => {
+                setEditingBook(null);
+                setFormOpen(true);
+              }}
+            >
+              <Plus className="size-4" /> Nouveau livre
+            </Button>
+          </div>
         )}
       </div>
 
