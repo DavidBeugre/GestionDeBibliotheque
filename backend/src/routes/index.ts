@@ -14,6 +14,7 @@ import activityLogRoutes from './activityLog.routes';
 import settingsRoutes from './settings.routes';
 import dashboardRoutes from './dashboard.routes';
 import reportRoutes from './report.routes';
+import userRoutes from './user.routes';
 
 const router = Router();
 
@@ -33,5 +34,6 @@ router.use('/activity-logs', activityLogRoutes);
 router.use('/settings', settingsRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/reports', reportRoutes);
+router.use('/users', userRoutes);
 
 export default router;

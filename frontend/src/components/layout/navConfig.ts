@@ -5,6 +5,7 @@ import {
   Tags,
   Bell,
   CircleHelp,
+  UserCog,
   Users,
   Clock3,
   BookMarked,
@@ -40,4 +41,5 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Rapports', path: '/reports', icon: BarChart3, roles: ['ADMIN', 'LIBRARIAN'] },
   { label: 'Scanner', path: '/scanner', icon: ScanLine, roles: ['ADMIN', 'LIBRARIAN'] },
   { label: 'Paramètres', path: '/settings', icon: Settings, roles: ['ADMIN'] },
+  { label: 'Utilisateurs', path: '/users', icon: UserCog, roles: ['ADMIN'] },
 ];

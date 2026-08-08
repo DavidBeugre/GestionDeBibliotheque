@@ -29,6 +29,7 @@ import AuthorsPage from '@/pages/AuthorsPage';
 import CatalogSettingsPage from '@/pages/CatalogSettingsPage';
 import NotificationsPage from '@/pages/NotificationsPage';
 import HelpPage from '@/pages/HelpPage';
+import UsersPage from '@/pages/UsersPage';
 
 export const router = createBrowserRouter([
   {
@@ -72,7 +73,7 @@ export const router = createBrowserRouter([
           },
           {
             element: <RoleGuard allowedRoles={['ADMIN']} />,
-            children: [{ path: '/settings', element: <SettingsPage /> }],
+            children: [{ path: '/settings', element: <SettingsPage /> }, { path: '/users', element: <UsersPage /> }],
           },
         ],
       },
