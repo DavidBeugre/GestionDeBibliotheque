@@ -29,6 +29,7 @@ import { bookService } from '@/services/book.service';
 import { queryKeys, PERMISSIONS } from '@/constants';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { BOOK_STATUS_CONFIG, COPY_STATUS_CONFIG } from '@/utils/statusConfig';
+import { getPersistentMediaUrl } from '@/utils/media';
 import type { CopyStatus } from '@/types';
 import { BookFormDialog } from './BookFormDialog';
 import { AddCopyDialog } from './AddCopyDialog';
@@ -132,8 +133,8 @@ export default function BookDetailPage() {
         {/* Couverture */}
         <div className="space-y-3">
           <div className="relative aspect-[2/3] w-full max-w-xs overflow-hidden rounded-xl border border-border bg-muted shadow-sm">
-            {book.coverImageUrl ? (
-              <img src={book.coverImageUrl} alt={book.title} className="h-full w-full object-cover" />
+            {getPersistentMediaUrl(book.coverImageUrl) ? (
+              <img src={getPersistentMediaUrl(book.coverImageUrl)} alt={book.title} className="h-full w-full object-cover" />
             ) : (
               <div className="flex h-full w-full items-center justify-center">
                 <BookOpen className="size-10 text-muted-foreground" />

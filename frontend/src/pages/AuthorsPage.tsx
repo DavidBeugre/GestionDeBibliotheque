@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { catalogService } from '@/services/catalog.service';
 import { queryKeys } from '@/constants';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
+import { getPersistentMediaUrl } from '@/utils/media';
 import type { Author } from '@/types';
 
 export default function AuthorsPage() {
@@ -87,7 +88,7 @@ export default function AuthorsPage() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {authors.map((author) => (
             <Card key={author.id} className="flex items-center gap-3 p-4">
-              {author.photoUrl ? <img src={author.photoUrl} alt={author.name} className="size-10 shrink-0 rounded-full object-cover" /> : <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">{author.name.charAt(0).toUpperCase()}</div>}
+              {getPersistentMediaUrl(author.photoUrl) ? <img src={getPersistentMediaUrl(author.photoUrl)} alt={author.name} className="size-10 shrink-0 rounded-full object-cover" /> : <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">{author.name.charAt(0).toUpperCase()}</div>}
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{author.name}</p>
                 <p className="truncate text-xs text-muted-foreground">{author.nationality || 'Nationalité non renseignée'}</p>

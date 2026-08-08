@@ -38,6 +38,9 @@ export function uploadBufferToCloudinary(
   mimeType = 'image/png'
 ): Promise<CloudinaryUploadResult> {
   if (!isCloudinaryConfigured) {
+    if (env.nodeEnv === 'production') {
+      return Promise.reject(ApiError.internal('Stockage Cloudinary non configuré : l’image ne peut pas être enregistrée durablement'));
+    }
     return uploadLocally(buffer, mimeType);
   }
 

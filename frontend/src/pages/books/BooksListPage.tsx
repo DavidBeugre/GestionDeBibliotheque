@@ -26,6 +26,7 @@ import { catalogService } from '@/services/catalog.service';
 import { queryKeys, PERMISSIONS } from '@/constants';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { BOOK_STATUS_CONFIG } from '@/utils/statusConfig';
+import { getPersistentMediaUrl } from '@/utils/media';
 import type { Book } from '@/types';
 import { BookFormDialog } from './BookFormDialog';
 
@@ -246,8 +247,8 @@ export default function BooksListPage() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <div className="flex h-12 w-9 shrink-0 items-center justify-center overflow-hidden rounded bg-muted">
-                        {book.coverImageUrl ? (
-                          <img src={book.coverImageUrl} alt="" className="h-full w-full object-cover" />
+                        {getPersistentMediaUrl(book.coverImageUrl) ? (
+                          <img src={getPersistentMediaUrl(book.coverImageUrl)} alt="" className="h-full w-full object-cover" />
                         ) : (
                           <BookOpen className="size-4 text-muted-foreground" />
                         )}
@@ -305,8 +306,8 @@ export default function BooksListPage() {
                 className="group flex flex-col items-start gap-2 text-left"
               >
                 <div className="aspect-[2/3] w-full overflow-hidden rounded-lg border border-border bg-muted shadow-xs transition-shadow group-hover:shadow-md">
-                  {book.coverImageUrl ? (
-                    <img src={book.coverImageUrl} alt="" className="h-full w-full object-cover" />
+                  {getPersistentMediaUrl(book.coverImageUrl) ? (
+                    <img src={getPersistentMediaUrl(book.coverImageUrl)} alt="" className="h-full w-full object-cover" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center">
                       <BookOpen className="size-6 text-muted-foreground" />

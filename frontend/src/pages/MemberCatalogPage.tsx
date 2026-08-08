@@ -17,6 +17,7 @@ import { catalogService } from '@/services/catalog.service';
 import { memberPortalService } from '@/services/memberPortal.service';
 import { queryKeys } from '@/constants';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
+import { getPersistentMediaUrl } from '@/utils/media';
 import type { Book } from '@/types';
 
 export default function MemberCatalogPage() {
@@ -74,7 +75,7 @@ export default function MemberCatalogPage() {
           {books.map((book) => {
             const isAvailable = book.availableCopies > 0;
             return <div key={book.id} className="flex cursor-pointer gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/40" onClick={() => setSelectedBook(book)}>
-              <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded bg-muted">{book.coverImageUrl ? <img src={book.coverImageUrl} alt="" className="size-full object-cover" /> : <BookOpen className="size-5 text-muted-foreground" />}</div>
+              <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded bg-muted">{getPersistentMediaUrl(book.coverImageUrl) ? <img src={getPersistentMediaUrl(book.coverImageUrl)} alt="" className="size-full object-cover" /> : <BookOpen className="size-5 text-muted-foreground" />}</div>
               <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{book.title}</p><p className="mt-0.5 truncate text-xs text-muted-foreground">{book.authors?.map((item) => item.author.name).join(', ') || 'Auteur inconnu'}</p>{(book.digitalFileUrl || book.externalLink) && <a className="mt-2 inline-block text-xs font-medium text-primary hover:underline" href={book.digitalFileUrl || book.externalLink || '#'} target="_blank" rel="noreferrer">Lire le livre numérique</a>}<div className="mt-3 flex items-center justify-between gap-2"><Badge variant={isAvailable ? 'success' : 'warning'}>{isAvailable ? `${book.availableCopies} disponible(s)` : 'Indisponible'}</Badge>{isAvailable ? <span className="text-xs text-muted-foreground">À emprunter au comptoir</span> : <Button size="sm" onClick={() => reserveMutation.mutate(book.id)} isLoading={reserveMutation.isPending}>Réserver</Button>}</div></div>
             </div>;
           })}

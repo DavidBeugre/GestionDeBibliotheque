@@ -10,6 +10,7 @@ function initials(firstName: string, lastName: string): string {
 
 function resolveMediaUrl(value?: string | null): string | undefined {
   if (!value) return undefined;
+  if ((value.startsWith('/uploads/') || /\/uploads\//i.test(value)) && !import.meta.env.DEV) return undefined;
   if (/^https?:\/\//i.test(value)) return value;
   // Les anciens enregistrements ne contiennent parfois qu'un nom de fichier.
   // Leur fichier local n'existe plus sur Render après un redéploiement.

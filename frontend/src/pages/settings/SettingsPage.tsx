@@ -14,6 +14,7 @@ import { settingsService } from '@/services/settings.service';
 import { queryKeys } from '@/constants';
 import { API_BASE_URL } from '@/constants';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
+import { getPersistentMediaUrl } from '@/utils/media';
 
 const settingsSchema = z.object({
   libraryName: z.string().min(1, 'Le nom est requis'),
@@ -33,6 +34,7 @@ export default function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const settingsQuery = useQuery({ queryKey: queryKeys.settings, queryFn: settingsService.get });
+  const logoUrl = getPersistentMediaUrl(settingsQuery.data?.logoUrl);
 
   const {
     register,
@@ -98,8 +100,8 @@ export default function SettingsPage() {
         <CardContent className="space-y-4">
           <div className="flex items-center gap-4">
             <div className="flex size-16 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted">
-              {settingsQuery.data?.logoUrl ? (
-                <img src={resolveMediaUrl(settingsQuery.data.logoUrl)} alt="Logo" className="h-full w-full object-cover" />
+              {logoUrl ? (
+                <img src={resolveMediaUrl(logoUrl)} alt="Logo" className="h-full w-full object-cover" />
               ) : (
                 <Library className="size-6 text-muted-foreground" />
               )}
