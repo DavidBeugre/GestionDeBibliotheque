@@ -32,6 +32,7 @@ export default function MemberCatalogPage() {
   const params = { page, limit: 12, search: debouncedSearch || undefined, status: 'ACTIVE', categoryId, sort, order };
   const booksQuery = useQuery({ queryKey: queryKeys.books(params), queryFn: () => bookService.list(params) });
   const categoriesQuery = useQuery({ queryKey: queryKeys.categories, queryFn: catalogService.listCategories });
+  const recommendationsQuery = useQuery({ queryKey: ['books', selectedBook?.id, 'recommendations'], queryFn: () => bookService.recommendations(selectedBook!.id), enabled: !!selectedBook });
 
   const reserveMutation = useMutation({
     mutationFn: memberPortalService.reserve,
@@ -83,6 +84,7 @@ export default function MemberCatalogPage() {
       <Dialog open={!!selectedBook} onOpenChange={(open) => { if (!open) setSelectedBook(null); }}>
         <DialogContent className="max-w-lg">
           {selectedBook && <><DialogHeader><DialogTitle>{selectedBook.title}</DialogTitle></DialogHeader><div className="space-y-4"><div className="flex gap-4"><div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted">{selectedBook.coverImageUrl ? <img src={selectedBook.coverImageUrl} alt="" className="size-full object-cover" /> : <BookOpen className="size-7 text-muted-foreground" />}</div><div><p className="font-medium">{selectedBook.authors.map((item) => item.author.name).join(', ') || 'Auteur inconnu'}</p><p className="mt-1 text-sm text-muted-foreground">{selectedBook.category?.name || 'Sans catégorie'} · {selectedBook.year || 'Année non renseignée'}</p><Badge className="mt-2" variant={selectedBook.availableCopies > 0 ? 'success' : 'warning'}>{selectedBook.availableCopies > 0 ? `${selectedBook.availableCopies} exemplaire(s) disponible(s)` : 'Indisponible'}</Badge></div></div><p className="text-sm leading-relaxed text-muted-foreground">{selectedBook.summary || 'Aucun résumé renseigné pour ce livre.'}</p>{(selectedBook.digitalFileUrl || selectedBook.externalLink) && <Button asChild><a href={selectedBook.digitalFileUrl || selectedBook.externalLink || '#'} target="_blank" rel="noreferrer">Lire le livre numérique</a></Button>}</div></>}
+          {selectedBook && (recommendationsQuery.data?.length ?? 0) > 0 && <div className="border-t pt-4"><p className="mb-2 text-sm font-semibold">Vous aimerez aussi</p><div className="grid gap-2 sm:grid-cols-2">{recommendationsQuery.data!.slice(0, 4).map((book) => <button key={book.id} type="button" className="rounded-md border p-2 text-left transition-colors hover:bg-muted" onClick={() => setSelectedBook(book)}><p className="truncate text-sm font-medium">{book.title}</p><p className="truncate text-xs text-muted-foreground">{book.authors.map((item) => item.author.name).join(', ') || 'Auteur inconnu'}</p></button>)}</div></div>}
         </DialogContent>
       </Dialog>
     </div>
