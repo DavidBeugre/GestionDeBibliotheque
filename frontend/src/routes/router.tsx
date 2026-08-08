@@ -28,6 +28,7 @@ import MemberHistoryPage from '@/pages/MemberHistoryPage';
 import AuthorsPage from '@/pages/AuthorsPage';
 import CatalogSettingsPage from '@/pages/CatalogSettingsPage';
 import NotificationsPage from '@/pages/NotificationsPage';
+import HelpPage from '@/pages/HelpPage';
 
 export const router = createBrowserRouter([
   {
@@ -51,6 +52,7 @@ export const router = createBrowserRouter([
           { path: '/catalogue', element: <MemberCatalogPage /> },
           { path: '/my-history', element: <MemberHistoryPage /> },
           { path: '/notifications', element: <NotificationsPage /> },
+          { path: '/help', element: <HelpPage /> },
 
           {
             element: <RoleGuard allowedRoles={['ADMIN', 'LIBRARIAN']} />,
