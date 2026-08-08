@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Menu, Search, Bell, Moon, Sun, LogOut, User as UserIcon, Settings } from 'lucide-react';
+import { Menu, Search, Bell, Download, Moon, Sun, LogOut, User as UserIcon, Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,11 +23,17 @@ function initials(firstName: string, lastName: string): string {
   return `${firstName?.[0] ?? ''}${lastName?.[0] ?? ''}`.toUpperCase();
 }
 
+type InstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+};
+
 export function Navbar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [globalSearch, setGlobalSearch] = useState('');
+  const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
   const queryClient = useQueryClient();
   const notificationsQuery = useQuery({ queryKey: ['notifications', 'menu'], queryFn: () => notificationService.list(), refetchInterval: 60000 });
   const unreadCountQuery = useQuery({ queryKey: ['notifications', 'unread-count'], queryFn: notificationService.unreadCount, refetchInterval: 60000 });
@@ -36,6 +42,22 @@ export function Navbar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
   };
   const markReadMutation = useMutation({ mutationFn: notificationService.markRead, onSuccess: refreshNotifications });
   const markAllMutation = useMutation({ mutationFn: notificationService.markAllRead, onSuccess: refreshNotifications });
+
+  useEffect(() => {
+    const onInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setInstallPrompt(event as InstallPromptEvent);
+    };
+    window.addEventListener('beforeinstallprompt', onInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', onInstallPrompt);
+  }, []);
+
+  const installApp = async () => {
+    if (!installPrompt) return;
+    await installPrompt.prompt();
+    await installPrompt.userChoice;
+    setInstallPrompt(null);
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -64,6 +86,7 @@ export function Navbar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
       </div>
 
       <div className="ml-auto flex items-center gap-1.5">
+        {installPrompt && <Button variant="ghost" size="icon" onClick={installApp} aria-label="Installer Shelfly" title="Installer Shelfly"><Download className="size-4" /></Button>}
         <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Changer de thème">
           {theme === 'light' ? <Moon className="size-4" /> : <Sun className="size-4" />}
         </Button>
